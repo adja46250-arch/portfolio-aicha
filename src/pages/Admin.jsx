@@ -25,6 +25,18 @@ export default function Admin() {
 
   const [projects, setProjects] = useState([])
   const [messages, setMessages] = useState([])
+  const [testimonials, setTestimonials] = useState([])
+  const [testiForm, setTestiForm] = useState({
+    name: '',
+    role: '',
+    title: '',
+    rating: 5,
+    message: '',
+  })
+  const [testiError, setTestiError] = useState('')
+  const [tab, setTab] = useState('projects')
+  const [filter, setFilter] = useState('all')
+  const [notice, setNotice] = useState('')
   const [form, setForm] = useState(EMPTY_FORM)
   const [galleryUrlInput, setGalleryUrlInput] = useState('')
   const [savingError, setSavingError] = useState('')
@@ -34,6 +46,15 @@ export default function Admin() {
   const [heroImage, setHeroImage] = useState('')
   const [heroUploading, setHeroUploading] = useState(false)
   const [heroError, setHeroError] = useState('')
+
+  const [aboutImage, setAboutImage] = useState('')
+  const [aboutUploading, setAboutUploading] = useState(false)
+  const [aboutError, setAboutError] = useState('')
+
+  const [formations, setFormations] = useState([])
+  const EMPTY_FORMATION = { id: null, period: '', title: '', description: '' }
+  const [formationForm, setFormationForm] = useState(EMPTY_FORMATION)
+  const [formationError, setFormationError] = useState('')
 
   useEffect(() => {
     if (!isSupabaseConfigured) {
@@ -52,9 +73,29 @@ export default function Admin() {
     if (session) {
       loadProjects()
       loadMessages()
+      loadTestimonials()
       loadHeroImage()
+      loadAboutImage()
+      loadFormations()
     }
   }, [session])
+
+  async function loadAboutImage() {
+    const { data, error } = await supabase
+      .from('settings')
+      .select('about_image')
+      .eq('id', 1)
+      .single()
+    if (!error) setAboutImage(data?.about_image || '')
+  }
+
+  async function loadFormations() {
+    const { data, error } = await supabase
+      .from('formations')
+      .select('*')
+      .order('position', { ascending: true })
+    if (!error) setFormations(data || [])
+  }
 
   async function loadHeroImage() {
     const { data, error } = await supabase
@@ -78,8 +119,46 @@ export default function Admin() {
       .from('messages')
       .select('*')
       .order('created_at', { ascending: false })
-      .limit(20)
+      .limit(100)
     if (!error) setMessages(data || [])
+  }
+
+  async function loadTestimonials() {
+    const { data, error } = await supabase
+      .from('testimonials')
+      .select('*')
+      .order('created_at', { ascending: false })
+    if (!error) setTestimonials(data || [])
+  }
+
+  async function setTestimonialApproved(id, approved) {
+    const { error } = await supabase.from('testimonials').update({ approved }).eq('id', id)
+    if (!error) loadTestimonials()
+  }
+
+  async function deleteTestimonial(id) {
+    if (!confirm('Supprimer ce témoignage ?')) return
+    const { error } = await supabase.from('testimonials').delete().eq('id', id)
+    if (!error) loadTestimonials()
+  }
+
+  async function addTestimonial(e) {
+    e.preventDefault()
+    setTestiError('')
+    const { error } = await supabase.from('testimonials').insert({
+      name: testiForm.name.trim(),
+      role: testiForm.role.trim() || null,
+      title: testiForm.title.trim() || null,
+      rating: testiForm.rating,
+      message: testiForm.message.trim(),
+      approved: true,
+    })
+    if (error) {
+      setTestiError(error.message)
+      return
+    }
+    setTestiForm({ name: '', role: '', title: '', rating: 5, message: '' })
+    loadTestimonials()
   }
 
   async function handleLogin(e) {
@@ -227,22 +306,120 @@ export default function Admin() {
     e.target.value = ''
   }
 
+  async function handleAboutUpload(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setAboutUploading(true)
+    setAboutError('')
+
+    const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '-')
+    const path = `about-${Date.now()}-${safeName}`
+
+    const { error: uploadErr } = await supabase.storage
+      .from(IMAGE_BUCKET)
+      .upload(path, file, { cacheControl: '3600', upsert: false })
+
+    if (uploadErr) {
+      setAboutError(
+        uploadErr.message.includes('Bucket not found')
+          ? `Le bucket "${IMAGE_BUCKET}" n'existe pas encore — crée-le dans Supabase (Storage > New bucket, coché "Public").`
+          : uploadErr.message
+      )
+      setAboutUploading(false)
+      e.target.value = ''
+      return
+    }
+
+    const { data } = supabase.storage.from(IMAGE_BUCKET).getPublicUrl(path)
+
+    const { error: saveErr } = await supabase
+      .from('settings')
+      .upsert({ id: 1, about_image: data.publicUrl })
+
+    if (saveErr) {
+      setAboutError(saveErr.message)
+      setAboutUploading(false)
+      e.target.value = ''
+      return
+    }
+
+    setAboutImage(data.publicUrl)
+    setAboutUploading(false)
+    e.target.value = ''
+  }
+
+  function editFormation(f) {
+    setFormationForm({
+      id: f.id,
+      period: f.period || '',
+      title: f.title || '',
+      description: f.description || '',
+    })
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  async function saveFormation(e) {
+    e.preventDefault()
+    setFormationError('')
+
+    const payload = {
+      period: formationForm.period.trim(),
+      title: formationForm.title.trim(),
+      description: formationForm.description.trim(),
+    }
+
+    const query = formationForm.id
+      ? supabase.from('formations').update(payload).eq('id', formationForm.id)
+      : supabase.from('formations').insert({ ...payload, position: formations.length })
+
+    const { error } = await query
+    if (error) {
+      setFormationError(error.message)
+      return
+    }
+    setFormationForm(EMPTY_FORMATION)
+    loadFormations()
+    flash(formationForm.id ? 'Formation mise à jour ✓' : 'Formation ajoutée ✓')
+  }
+
+  async function deleteFormation(id) {
+    if (!confirm('Supprimer cette formation ?')) return
+    const { error } = await supabase.from('formations').delete().eq('id', id)
+    if (!error) loadFormations()
+  }
+
+  async function moveFormation(index, direction) {
+    const target = index + direction
+    if (target < 0 || target >= formations.length) return
+    const a = formations[index]
+    const b = formations[target]
+    await Promise.all([
+      supabase.from('formations').update({ position: b.position }).eq('id', a.id),
+      supabase.from('formations').update({ position: a.position }).eq('id', b.id),
+    ])
+    loadFormations()
+  }
+
   async function handleSave(e) {
     e.preventDefault()
     setSavingError('')
 
+    const isDev = form.category === 'dev'
     const payload = {
       title: form.title,
       category: form.category,
-      status: form.status,
-      description: form.description,
-      stack: form.stack
-        .split(',')
-        .map((s) => s.trim())
-        .filter(Boolean),
-      link: form.link,
-      image: form.category === 'dev' ? form.images[0] || '' : form.image,
-      images: form.category === 'dev' ? form.images : [],
+      status: isDev ? form.status : 'live',
+      description: isDev ? form.description : '',
+      stack: isDev
+        ? form.stack
+            .split(',')
+            .map((s) => s.trim())
+            .filter(Boolean)
+        : [],
+      link: isDev ? form.link : '',
+      image: isDev ? form.images[0] || '' : form.image,
+      images: isDev ? form.images : [],
     }
 
     const query = form.id
@@ -257,6 +434,12 @@ export default function Admin() {
     setForm(EMPTY_FORM)
     setGalleryUrlInput('')
     loadProjects()
+    flash(form.id ? 'Projet mis à jour ✓' : 'Projet ajouté ✓')
+  }
+
+  function flash(text) {
+    setNotice(text)
+    setTimeout(() => setNotice(''), 3000)
   }
 
   async function handleDelete(id) {
@@ -320,257 +503,645 @@ export default function Admin() {
     )
   }
 
+  const devCount = projects.filter((p) => p.category === 'dev').length
+  const designCount = projects.filter((p) => p.category === 'design').length
+  const liveCount = projects.filter((p) => p.category === 'dev' && p.status === 'live').length
+  const wipCount = projects.filter((p) => p.category === 'dev' && p.status === 'wip').length
+  const pendingCount = testimonials.filter((t) => !t.approved).length
+  const shownProjects = projects.filter((p) => filter === 'all' || p.category === filter)
+  const isDev = form.category === 'dev'
+
+  function formatDate(d) {
+    return d
+      ? new Date(d).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })
+      : ''
+  }
+
   return (
     <main className="admin-shell wrap">
-      <div className="section-head">
-        <h2>Admin — Projets</h2>
+      <header className="admin-head">
+        <div>
+          <p className="eyebrow">Espace privé</p>
+          <h1 className="anton">Tableau de bord</h1>
+        </div>
         <button className="btn btn-line" onClick={handleLogout}>
           Se déconnecter
         </button>
+      </header>
+
+      <div className="admin-stats">
+        <div className="admin-stat">
+          <strong>{projects.length}</strong>
+          <span>Projets</span>
+          <small>
+            {devCount} web · {designCount} infographie
+          </small>
+        </div>
+        <div className="admin-stat">
+          <strong>{liveCount}</strong>
+          <span>Sites en ligne</span>
+          <small>{wipCount} en cours</small>
+        </div>
+        <div className="admin-stat">
+          <strong>{messages.length}</strong>
+          <span>Messages reçus</span>
+          <small>via le formulaire de contact</small>
+        </div>
+        <div className={`admin-stat${pendingCount > 0 ? ' alert' : ''}`}>
+          <strong>{pendingCount}</strong>
+          <span>Avis à valider</span>
+          <small>{testimonials.length - pendingCount} publiés</small>
+        </div>
       </div>
 
-      <div className="admin-form" style={{ gridTemplateColumns: '1fr', marginBottom: 40 }}>
-        <div className="field full">
-          <label>Ta photo (page d'accueil)</label>
-          <input type="file" accept="image/*" onChange={handleHeroUpload} disabled={heroUploading} />
-          {heroUploading && <p className="form-status">Envoi en cours…</p>}
-          {heroError && <p className="form-status error">{heroError}</p>}
-          {heroImage && (
-            <div style={{ marginTop: 10 }}>
-              <img
-                src={heroImage}
-                alt="Aperçu"
-                style={{ maxWidth: 220, borderRadius: 4, border: '1px solid var(--line)' }}
-              />
-            </div>
-          )}
-        </div>
-      </div>
+      <nav className="admin-tabs">
+        {[
+          ['projects', 'Projets'],
+          ['testimonials', 'Témoignages'],
+          ['messages', 'Messages'],
+          ['parcours', 'Parcours'],
+          ['settings', 'Réglages'],
+        ].map(([key, label]) => (
+          <button
+            key={key}
+            type="button"
+            className={tab === key ? 'active' : ''}
+            onClick={() => setTab(key)}
+          >
+            {label}
+            {key === 'testimonials' && pendingCount > 0 && (
+              <span className="admin-badge">{pendingCount}</span>
+            )}
+            {key === 'messages' && messages.length > 0 && (
+              <span className="admin-badge muted">{messages.length}</span>
+            )}
+          </button>
+        ))}
+      </nav>
 
-      <form className="admin-form" onSubmit={handleSave}>
-        <div className="field">
-          <label>Titre</label>
-          <input
-            required
-            value={form.title}
-            onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
-          />
-        </div>
-        <div className="field">
-          <label>Catégorie</label>
-          <select
-            value={form.category}
-            onChange={(e) => setForm((f) => ({ ...f, category: e.target.value }))}
-          >
-            <option value="dev">Développement</option>
-            <option value="design">Infographie</option>
-          </select>
-        </div>
-        <div className="field">
-          <label>Statut</label>
-          <select
-            value={form.status}
-            onChange={(e) => setForm((f) => ({ ...f, status: e.target.value }))}
-          >
-            <option value="live">En ligne</option>
-            <option value="wip">En cours</option>
-          </select>
-        </div>
-        <div className="field">
-          <label>Lien (optionnel)</label>
-          <input
-            value={form.link}
-            onChange={(e) => setForm((f) => ({ ...f, link: e.target.value }))}
-          />
-        </div>
-        <div className="field full">
-          <label>Description</label>
-          <textarea
-            required
-            value={form.description}
-            onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
-          />
-        </div>
-        <div className="field full">
-          <label>Stack (séparée par des virgules)</label>
-          <input
-            value={form.stack}
-            onChange={(e) => setForm((f) => ({ ...f, stack: e.target.value }))}
-            placeholder="React, Supabase, Tailwind"
-          />
-        </div>
-        {form.category === 'dev' ? (
-          <>
-            <div className="field full">
-              <label>Captures d'écran du site (plusieurs possibles)</label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={handleGalleryUpload}
-                disabled={uploading}
-              />
-              {uploading && <p className="form-status">Envoi en cours…</p>}
-              {uploadError && <p className="form-status error">{uploadError}</p>}
-              {form.images.length > 0 && (
-                <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap', marginTop: 10 }}>
-                  {form.images.map((src, i) => (
-                    <div key={src + i} style={{ position: 'relative' }}>
-                      <img
-                        src={src}
-                        alt=""
-                        style={{
-                          maxWidth: 120,
-                          maxHeight: 90,
-                          objectFit: 'cover',
-                          borderRadius: 4,
-                          border: '1px solid var(--line)',
-                          display: 'block',
-                        }}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => removeGalleryImage(i)}
-                        aria-label="Retirer cette image"
-                        style={{
-                          position: 'absolute',
-                          top: -8,
-                          right: -8,
-                          width: 22,
-                          height: 22,
-                          borderRadius: '50%',
-                          background: '#1a1a1a',
-                          color: '#fff',
-                          border: 'none',
-                          cursor: 'pointer',
-                          fontSize: 13,
-                          lineHeight: '22px',
-                        }}
-                      >
-                        ×
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-            <div className="field full">
-              <label>Ou ajouter une URL d'image directement</label>
-              <div style={{ display: 'flex', gap: 8 }}>
-                <input
-                  value={galleryUrlInput}
-                  onChange={(e) => setGalleryUrlInput(e.target.value)}
-                  placeholder="https://..."
-                  style={{ flex: 1 }}
-                />
-                <button type="button" className="btn btn-line" onClick={addGalleryUrl}>
-                  Ajouter
+      {notice && <div className="admin-toast">{notice}</div>}
+
+      {tab === 'projects' && (
+        <>
+          <form className="admin-card" onSubmit={handleSave}>
+            <div className="admin-card-head">
+              <h2>{form.id ? 'Modifier le projet' : 'Nouveau projet'}</h2>
+              <div className="admin-segment" role="tablist">
+                <button
+                  type="button"
+                  className={isDev ? 'active' : ''}
+                  onClick={() => setForm((f) => ({ ...f, category: 'dev' }))}
+                >
+                  Développement
+                </button>
+                <button
+                  type="button"
+                  className={!isDev ? 'active' : ''}
+                  onClick={() => setForm((f) => ({ ...f, category: 'design' }))}
+                >
+                  Infographie
                 </button>
               </div>
-              {form.images.length > 0 && (
-                <p className="form-status">
-                  {form.images.length} image{form.images.length > 1 ? 's' : ''} — la première
-                  s'affiche par défaut, les suivantes défilent au survol de la carte.
-                </p>
-              )}
             </div>
-          </>
-        ) : (
-          <>
-            <div className="field full">
-              <label>Photo / affiche</label>
-              <input type="file" accept="image/*" onChange={handleFileUpload} disabled={uploading} />
-              {uploading && <p className="form-status">Envoi en cours…</p>}
-              {uploadError && <p className="form-status error">{uploadError}</p>}
-              {form.image && (
-                <div style={{ marginTop: 10 }}>
-                  <img
-                    src={form.image}
-                    alt="Aperçu"
-                    style={{ maxWidth: 220, borderRadius: 4, border: '1px solid var(--line)' }}
-                  />
+
+            <div className="admin-fields">
+              <div className="field full">
+                <label>Titre</label>
+                <input
+                  required
+                  value={form.title}
+                  onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+                />
+              </div>
+
+              {isDev ? (
+                <>
+                  <div className="field">
+                    <label>Statut</label>
+                    <select
+                      value={form.status}
+                      onChange={(e) => setForm((f) => ({ ...f, status: e.target.value }))}
+                    >
+                      <option value="live">En ligne</option>
+                      <option value="wip">En cours</option>
+                    </select>
+                  </div>
+                  <div className="field">
+                    <label>Lien du site (optionnel)</label>
+                    <input
+                      value={form.link}
+                      placeholder="https://..."
+                      onChange={(e) => setForm((f) => ({ ...f, link: e.target.value }))}
+                    />
+                  </div>
+                  <div className="field full">
+                    <label>Description</label>
+                    <textarea
+                      required
+                      value={form.description}
+                      onChange={(e) => setForm((f) => ({ ...f, description: e.target.value }))}
+                    />
+                  </div>
+                  <div className="field full">
+                    <label>Technologies (séparées par des virgules)</label>
+                    <input
+                      value={form.stack}
+                      onChange={(e) => setForm((f) => ({ ...f, stack: e.target.value }))}
+                      placeholder="React, Supabase, Tailwind"
+                    />
+                  </div>
+
+                  <div className="field full">
+                    <label>Captures d'écran du site</label>
+                    <div className="admin-thumbs">
+                      {form.images.map((src, i) => (
+                        <div key={src + i} className="admin-thumb">
+                          <img src={src} alt="" />
+                          {i === 0 && <span className="admin-thumb-tag">Principale</span>}
+                          <button
+                            type="button"
+                            onClick={() => removeGalleryImage(i)}
+                            aria-label="Retirer cette image"
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                      <label className={`admin-upload${uploading ? ' busy' : ''}`}>
+                        <input
+                          type="file"
+                          accept="image/*"
+                          onChange={handleGalleryUpload}
+                          disabled={uploading}
+                          hidden
+                        />
+                        <span>{uploading ? 'Envoi…' : '+ Ajouter'}</span>
+                      </label>
+                    </div>
+                    {uploadError && <p className="form-status error">{uploadError}</p>}
+                    <div className="admin-inline">
+                      <input
+                        value={galleryUrlInput}
+                        onChange={(e) => setGalleryUrlInput(e.target.value)}
+                        placeholder="Ou colle l'URL d'une image"
+                      />
+                      <button type="button" className="btn btn-line" onClick={addGalleryUrl}>
+                        Ajouter
+                      </button>
+                    </div>
+                    {form.images.length > 1 && (
+                      <p className="form-status">
+                        La première s'affiche par défaut, les suivantes défilent au survol.
+                      </p>
+                    )}
+                  </div>
+                </>
+              ) : (
+                <div className="field full">
+                  <label>Image de l'affiche</label>
+                  <div className="admin-thumbs">
+                    {form.image && (
+                      <div className="admin-thumb big">
+                        <img src={form.image} alt="Aperçu" />
+                        <button
+                          type="button"
+                          onClick={() => setForm((f) => ({ ...f, image: '' }))}
+                          aria-label="Retirer l'image"
+                        >
+                          ×
+                        </button>
+                      </div>
+                    )}
+                    <label className={`admin-upload${uploading ? ' busy' : ''}`}>
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={handleFileUpload}
+                        disabled={uploading}
+                        hidden
+                      />
+                      <span>{uploading ? 'Envoi…' : form.image ? 'Remplacer' : '+ Ajouter'}</span>
+                    </label>
+                  </div>
+                  {uploadError && <p className="form-status error">{uploadError}</p>}
+                  <div className="admin-inline">
+                    <input
+                      value={form.image}
+                      onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))}
+                      placeholder="Ou colle l'URL d'une image"
+                    />
+                  </div>
                 </div>
               )}
             </div>
-            <div className="field full">
-              <label>Ou coller une URL d'image directement (optionnel)</label>
-              <input
-                value={form.image}
-                onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))}
-                placeholder="https://..."
-              />
-            </div>
-          </>
-        )}
-        <div className="field full">
-          <button type="submit" className="btn btn-solid">
-            {form.id ? 'Mettre à jour le projet' : 'Ajouter le projet'}
-          </button>
-          {form.id && (
-            <button
-              type="button"
-              className="btn btn-line"
-              style={{ marginLeft: 10 }}
-              onClick={() => {
-                setForm(EMPTY_FORM)
-                setGalleryUrlInput('')
-              }}
-            >
-              Annuler
-            </button>
-          )}
-          {savingError && <p className="form-status error">{savingError}</p>}
-        </div>
-      </form>
 
-      <table className="admin-table">
-        <thead>
-          <tr>
-            <th>Titre</th>
-            <th>Catégorie</th>
-            <th>Statut</th>
-            <th></th>
-          </tr>
-        </thead>
-        <tbody>
-          {projects.map((p) => (
-            <tr key={p.id}>
-              <td>{p.title}</td>
-              <td>{p.category === 'dev' ? 'Développement' : 'Infographie'}</td>
-              <td>{p.status === 'live' ? 'En ligne' : 'En cours'}</td>
-              <td>
-                <button className="btn btn-line" onClick={() => editProject(p)}>
-                  Modifier
-                </button>{' '}
-                <button className="btn btn-line" onClick={() => handleDelete(p.id)}>
-                  Supprimer
+            <div className="admin-actions">
+              <button type="submit" className="btn btn-solid" disabled={uploading}>
+                {form.id ? 'Mettre à jour' : 'Ajouter le projet'}
+              </button>
+              {form.id && (
+                <button
+                  type="button"
+                  className="btn btn-line"
+                  onClick={() => {
+                    setForm(EMPTY_FORM)
+                    setGalleryUrlInput('')
+                  }}
+                >
+                  Annuler
                 </button>
-              </td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+              )}
+              {savingError && <p className="form-status error">{savingError}</p>}
+            </div>
+          </form>
 
-      <div className="section-head" style={{ marginTop: 60 }}>
-        <h2>Messages reçus</h2>
-      </div>
-      <table className="admin-table">
-        <thead>
-          <tr>
-            <th>Nom</th>
-            <th>Email</th>
-            <th>Message</th>
-          </tr>
-        </thead>
-        <tbody>
-          {messages.map((m) => (
-            <tr key={m.id}>
-              <td>{m.name}</td>
-              <td>{m.email}</td>
-              <td>{m.message}</td>
-            </tr>
-          ))}
-        </tbody>
-      </table>
+          <div className="admin-list-head">
+            <h2>Mes projets</h2>
+            <div className="admin-chips">
+              {[
+                ['all', `Tous (${projects.length})`],
+                ['dev', `Développement (${devCount})`],
+                ['design', `Infographie (${designCount})`],
+              ].map(([key, label]) => (
+                <button
+                  key={key}
+                  type="button"
+                  className={filter === key ? 'active' : ''}
+                  onClick={() => setFilter(key)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {shownProjects.length === 0 ? (
+            <p className="admin-empty">Aucun projet dans cette catégorie pour l'instant.</p>
+          ) : (
+            <div className="admin-grid">
+              {shownProjects.map((p) => {
+                const thumb = (p.images && p.images[0]) || p.image
+                return (
+                  <article key={p.id} className="admin-project">
+                    <div className="admin-project-thumb">
+                      {thumb ? <img src={thumb} alt="" /> : <span>Pas d'image</span>}
+                      {p.images && p.images.length > 1 && (
+                        <span className="admin-count">{p.images.length} images</span>
+                      )}
+                    </div>
+                    <div className="admin-project-body">
+                      <div className="admin-project-tags">
+                        <span className="admin-tag">
+                          {p.category === 'dev' ? 'Développement' : 'Infographie'}
+                        </span>
+                        {p.category === 'dev' && (
+                          <span className={`admin-tag ${p.status}`}>
+                            {p.status === 'live' ? 'En ligne' : 'En cours'}
+                          </span>
+                        )}
+                      </div>
+                      <h3>{p.title}</h3>
+                      {p.description && <p>{p.description}</p>}
+                      {p.stack && p.stack.length > 0 && (
+                        <div className="admin-stack">
+                          {p.stack.map((s) => (
+                            <span key={s}>{s}</span>
+                          ))}
+                        </div>
+                      )}
+                      <div className="admin-project-actions">
+                        <button className="btn btn-line" onClick={() => editProject(p)}>
+                          Modifier
+                        </button>
+                        <button className="btn btn-line danger" onClick={() => handleDelete(p.id)}>
+                          Supprimer
+                        </button>
+                        {p.link && (
+                          <a className="admin-link" href={p.link} target="_blank" rel="noreferrer">
+                            Voir le site ↗
+                          </a>
+                        )}
+                      </div>
+                    </div>
+                  </article>
+                )
+              })}
+            </div>
+          )}
+        </>
+      )}
+
+      {tab === 'testimonials' && (
+        <>
+          <form className="admin-card" onSubmit={addTestimonial}>
+            <div className="admin-card-head">
+              <h2>Ajouter un témoignage</h2>
+              <span className="admin-hint">Publié tout de suite</span>
+            </div>
+            <div className="admin-fields">
+              <div className="field">
+                <label>Nom</label>
+                <input
+                  required
+                  value={testiForm.name}
+                  onChange={(e) => setTestiForm((f) => ({ ...f, name: e.target.value }))}
+                />
+              </div>
+              <div className="field">
+                <label>Rôle (optionnel)</label>
+                <input
+                  value={testiForm.role}
+                  onChange={(e) => setTestiForm((f) => ({ ...f, role: e.target.value }))}
+                />
+              </div>
+              <div className="field">
+                <label>Titre (optionnel)</label>
+                <input
+                  value={testiForm.title}
+                  onChange={(e) => setTestiForm((f) => ({ ...f, title: e.target.value }))}
+                />
+              </div>
+              <div className="field">
+                <label>Note</label>
+                <select
+                  value={testiForm.rating}
+                  onChange={(e) =>
+                    setTestiForm((f) => ({ ...f, rating: Number(e.target.value) }))
+                  }
+                >
+                  {[5, 4, 3, 2, 1].map((n) => (
+                    <option key={n} value={n}>
+                      {n} étoile{n > 1 ? 's' : ''}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              <div className="field full">
+                <label>Témoignage</label>
+                <textarea
+                  required
+                  value={testiForm.message}
+                  onChange={(e) => setTestiForm((f) => ({ ...f, message: e.target.value }))}
+                />
+              </div>
+            </div>
+            <div className="admin-actions">
+              <button type="submit" className="btn btn-solid">
+                Ajouter le témoignage
+              </button>
+              {testiError && <p className="form-status error">{testiError}</p>}
+            </div>
+          </form>
+
+          <div className="admin-list-head">
+            <h2>Témoignages</h2>
+          </div>
+          {testimonials.length === 0 ? (
+            <p className="admin-empty">Aucun témoignage pour l'instant.</p>
+          ) : (
+            <div className="admin-stack-list">
+              {[...testimonials]
+                .sort((x, y) => Number(x.approved) - Number(y.approved))
+                .map((t) => (
+                  <article key={t.id} className={`admin-item${t.approved ? '' : ' pending'}`}>
+                    <div className="admin-item-top">
+                      <div className="admin-avatar">{(t.name || '?').charAt(0).toUpperCase()}</div>
+                      <div className="admin-item-who">
+                        <strong>{t.name}</strong>
+                        <span>
+                          {t.role ? `${t.role} · ` : ''}
+                          {formatDate(t.created_at)}
+                        </span>
+                      </div>
+                      <span className={`admin-tag ${t.approved ? 'live' : 'wip'}`}>
+                        {t.approved ? 'Publié' : 'En attente'}
+                      </span>
+                    </div>
+                    <p className="admin-item-text">{t.message}</p>
+                    <div className="admin-project-actions">
+                      <button
+                        className="btn btn-line"
+                        onClick={() => setTestimonialApproved(t.id, !t.approved)}
+                      >
+                        {t.approved ? 'Masquer' : 'Publier'}
+                      </button>
+                      <button className="btn btn-line danger" onClick={() => deleteTestimonial(t.id)}>
+                        Supprimer
+                      </button>
+                    </div>
+                  </article>
+                ))}
+            </div>
+          )}
+        </>
+      )}
+
+      {tab === 'messages' && (
+        <>
+          <div className="admin-list-head">
+            <h2>Messages reçus</h2>
+          </div>
+          {messages.length === 0 ? (
+            <p className="admin-empty">Aucun message pour l'instant.</p>
+          ) : (
+            <div className="admin-stack-list">
+              {messages.map((m) => (
+                <article key={m.id} className="admin-item">
+                  <div className="admin-item-top">
+                    <div className="admin-avatar">{(m.name || '?').charAt(0).toUpperCase()}</div>
+                    <div className="admin-item-who">
+                      <strong>{m.name}</strong>
+                      <span>
+                        {m.email} · {formatDate(m.created_at)}
+                      </span>
+                    </div>
+                  </div>
+                  <p className="admin-item-text">{m.message}</p>
+                  <div className="admin-project-actions">
+                    <a
+                      className="btn btn-line"
+                      href={`mailto:${m.email}?subject=${encodeURIComponent('Re : ton message sur mon portfolio')}`}
+                    >
+                      Répondre par email
+                    </a>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+
+      {tab === 'parcours' && (
+        <>
+          <div className="admin-card">
+            <div className="admin-card-head">
+              <h2>Photo de la page Parcours</h2>
+              <span className="admin-hint">Différente de celle de l'accueil</span>
+            </div>
+            <div className="admin-fields">
+              <div className="field full">
+                <div className="admin-thumbs">
+                  {aboutImage && (
+                    <div className="admin-thumb big">
+                      <img src={aboutImage} alt="Aperçu" />
+                    </div>
+                  )}
+                  <label className={`admin-upload${aboutUploading ? ' busy' : ''}`}>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleAboutUpload}
+                      disabled={aboutUploading}
+                      hidden
+                    />
+                    <span>
+                      {aboutUploading ? 'Envoi…' : aboutImage ? 'Remplacer' : '+ Ajouter'}
+                    </span>
+                  </label>
+                </div>
+                {aboutError && <p className="form-status error">{aboutError}</p>}
+              </div>
+            </div>
+          </div>
+
+          <form className="admin-card" onSubmit={saveFormation}>
+            <div className="admin-card-head">
+              <h2>{formationForm.id ? 'Modifier la formation' : 'Ajouter une formation'}</h2>
+              <span className="admin-hint">Collège, lycée, université, certificats…</span>
+            </div>
+            <div className="admin-fields">
+              <div className="field">
+                <label>Période</label>
+                <input
+                  required
+                  placeholder="Ex. 2021 — 2024, ou En cours"
+                  value={formationForm.period}
+                  onChange={(e) =>
+                    setFormationForm((f) => ({ ...f, period: e.target.value }))
+                  }
+                />
+              </div>
+              <div className="field">
+                <label>Titre</label>
+                <input
+                  required
+                  placeholder="Ex. Baccalauréat série D"
+                  value={formationForm.title}
+                  onChange={(e) =>
+                    setFormationForm((f) => ({ ...f, title: e.target.value }))
+                  }
+                />
+              </div>
+              <div className="field full">
+                <label>Description (optionnel)</label>
+                <textarea
+                  placeholder="Établissement, mention, détails..."
+                  value={formationForm.description}
+                  onChange={(e) =>
+                    setFormationForm((f) => ({ ...f, description: e.target.value }))
+                  }
+                />
+              </div>
+            </div>
+            <div className="admin-actions">
+              <button type="submit" className="btn btn-solid">
+                {formationForm.id ? 'Mettre à jour' : 'Ajouter'}
+              </button>
+              {formationForm.id && (
+                <button
+                  type="button"
+                  className="btn btn-line"
+                  onClick={() => setFormationForm(EMPTY_FORMATION)}
+                >
+                  Annuler
+                </button>
+              )}
+              {formationError && <p className="form-status error">{formationError}</p>}
+            </div>
+          </form>
+
+          <div className="admin-list-head">
+            <h2>Mes formations</h2>
+          </div>
+          {formations.length === 0 ? (
+            <p className="admin-empty">Aucune formation ajoutée pour l'instant.</p>
+          ) : (
+            <div className="admin-stack-list">
+              {formations.map((f, i) => (
+                <article key={f.id} className="admin-item">
+                  <div className="admin-item-top">
+                    <div className="admin-reorder">
+                      <button
+                        type="button"
+                        disabled={i === 0}
+                        onClick={() => moveFormation(i, -1)}
+                        aria-label="Monter"
+                      >
+                        ↑
+                      </button>
+                      <button
+                        type="button"
+                        disabled={i === formations.length - 1}
+                        onClick={() => moveFormation(i, 1)}
+                        aria-label="Descendre"
+                      >
+                        ↓
+                      </button>
+                    </div>
+                    <div className="admin-item-who">
+                      <strong>{f.title}</strong>
+                      <span>{f.period}</span>
+                    </div>
+                  </div>
+                  {f.description && <p className="admin-item-text">{f.description}</p>}
+                  <div className="admin-project-actions">
+                    <button className="btn btn-line" onClick={() => editFormation(f)}>
+                      Modifier
+                    </button>
+                    <button
+                      className="btn btn-line danger"
+                      onClick={() => deleteFormation(f.id)}
+                    >
+                      Supprimer
+                    </button>
+                  </div>
+                </article>
+              ))}
+            </div>
+          )}
+        </>
+      )}
+
+      {tab === 'settings' && (
+        <div className="admin-card">
+          <div className="admin-card-head">
+            <h2>Photo de la page d'accueil</h2>
+          </div>
+          <div className="admin-fields">
+            <div className="field full">
+              <div className="admin-thumbs">
+                {heroImage && (
+                  <div className="admin-thumb big">
+                    <img src={heroImage} alt="Aperçu" />
+                  </div>
+                )}
+                <label className={`admin-upload${heroUploading ? ' busy' : ''}`}>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleHeroUpload}
+                    disabled={heroUploading}
+                    hidden
+                  />
+                  <span>{heroUploading ? 'Envoi…' : heroImage ? 'Remplacer' : '+ Ajouter'}</span>
+                </label>
+              </div>
+              {heroError && <p className="form-status error">{heroError}</p>}
+            </div>
+          </div>
+        </div>
+      )}
     </main>
   )
 }

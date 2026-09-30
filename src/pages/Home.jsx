@@ -6,6 +6,7 @@ import { supabase, isSupabaseConfigured } from '../lib/supabaseClient'
 import Reveal from '../components/Reveal'
 import Marquee from '../components/Marquee'
 import ProjectShots from '../components/ProjectShots'
+import Testimonials from '../components/Testimonials'
 
 function PosterCoverflow({ items }) {
   const [index, setIndex] = useState(0)
@@ -332,6 +333,8 @@ export default function Home() {
         </Reveal>
       </section>
 
+      <Testimonials />
+
       <section className="pull-quote wrap">
         <Reveal>
           <p>
@@ -339,60 +342,6 @@ export default function Home() {
           </p>
         </Reveal>
       </section>
-
-      <Reveal as="section" className="split">
-        <div>
-          <h3>Compétences &amp; outils</h3>
-          <div className="palette">
-            <div className="swatch" style={{ background: '#1c0a0d' }}></div>
-            <div className="swatch" style={{ background: '#f2a58e' }}></div>
-            <div className="swatch" style={{ background: '#d97a6c' }}></div>
-            <div className="swatch" style={{ background: '#f7ece2' }}></div>
-            <div className="swatch" style={{ background: '#0f0607' }}></div>
-          </div>
-          <div className="pill-row">
-            <span className="pill">React</span>
-            <span className="pill">Supabase</span>
-            <span className="pill">PHP / Laravel</span>
-            <span className="pill">JavaScript</span>
-            <span className="pill">Identité de marque</span>
-            <span className="pill">Affiches</span>
-          </div>
-        </div>
-        <div>
-          <h3>Ma méthode</h3>
-          <ol className="steps">
-            <li>
-              <span className="n">01</span>
-              <div>
-                <h4>Comprendre</h4>
-                <p>Le besoin réel avant la première ligne de code ou le premier croquis.</p>
-              </div>
-            </li>
-            <li>
-              <span className="n">02</span>
-              <div>
-                <h4>Concevoir</h4>
-                <p>Structure, contenu, direction visuelle — posés avant l'exécution.</p>
-              </div>
-            </li>
-            <li>
-              <span className="n">03</span>
-              <div>
-                <h4>Construire</h4>
-                <p>Code propre côté dev, fichiers soignés côté design.</p>
-              </div>
-            </li>
-            <li>
-              <span className="n">04</span>
-              <div>
-                <h4>Livrer</h4>
-                <p>Un résultat testé, présenté et prêt à être utilisé.</p>
-              </div>
-            </li>
-          </ol>
-        </div>
-      </Reveal>
 
       <section className="wrap" style={{ padding: '20px 0 80px' }}>
         <Reveal className="cta-band">

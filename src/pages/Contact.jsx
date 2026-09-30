@@ -1,5 +1,17 @@
 import { useState } from 'react'
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient'
+import Reveal from '../components/Reveal'
+import { SocialIcons } from '../components/SocialIcons'
+
+// Mets tes vrais liens ici dès que tu les as. Un badge ne s'affiche que si
+// son lien n'est pas vide — pas besoin de retirer une ligne, laisse-la à ''.
+const SOCIAL_LINKS = [
+  { key: 'email', label: 'Email', href: 'mailto:hello@aicha.com' },
+  { key: 'linkedin', label: 'LinkedIn', href: '' },
+  { key: 'github', label: 'GitHub', href: '' },
+  { key: 'tiktok', label: 'TikTok', href: '' },
+  { key: 'facebook', label: 'Facebook', href: '' },
+]
 
 export default function Contact() {
   const [form, setForm] = useState({ name: '', email: '', message: '' })
@@ -33,6 +45,8 @@ export default function Contact() {
     }
   }
 
+  const links = SOCIAL_LINKS.filter((s) => s.href)
+
   return (
     <main>
       <section className="page-hero wrap">
@@ -47,7 +61,7 @@ export default function Contact() {
       </section>
 
       <section className="contact-grid wrap">
-        <form className="contact-form" onSubmit={handleSubmit}>
+        <form className="contact-form contact-form-card" onSubmit={handleSubmit}>
           <div className="field">
             <label htmlFor="name">Nom</label>
             <input
@@ -72,6 +86,7 @@ export default function Contact() {
             <textarea
               id="message"
               required
+              rows={6}
               value={form.message}
               onChange={(e) => update('message', e.target.value)}
             />
@@ -92,23 +107,33 @@ export default function Contact() {
           )}
         </form>
 
-        <div>
-          <h3 className="eyebrow" style={{ marginBottom: 14 }}>
-            Autres façons de me joindre
-          </h3>
-          <p style={{ color: 'var(--muted)', marginBottom: 10 }}>Bouaké, Côte d'Ivoire</p>
-          <div className="interests-row">
-            <a href="mailto:hello@aicha.com" className="pill">
-              Email
-            </a>
-            <a href="#" className="pill">
-              LinkedIn
-            </a>
-            <a href="#" className="pill">
-              GitHub
-            </a>
+        <Reveal as="div" className="contact-side" delay={0.1}>
+          <div className="contact-card">
+            <h3>Autres façons de me joindre</h3>
+            <p className="contact-location">
+              <span aria-hidden="true"></span> Bouaké, Côte d'Ivoire
+            </p>
+
+            {links.length > 0 ? (
+              <div className="social-grid">
+                {links.map((s) => (
+                  <a
+                    key={s.key}
+                    href={s.href}
+                    target={s.key === 'email' ? undefined : '_blank'}
+                    rel={s.key === 'email' ? undefined : 'noreferrer'}
+                    className="social-link"
+                  >
+                    <span className="social-icon">{SocialIcons[s.key]}</span>
+                    {s.label}
+                  </a>
+                ))}
+              </div>
+            ) : (
+              <p className="contact-hint">Mes liens arrivent bientôt.</p>
+            )}
           </div>
-        </div>
+        </Reveal>
       </section>
     </main>
   )
