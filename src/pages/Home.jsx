@@ -116,8 +116,8 @@ export default function Home() {
   const glowY = useTransform(scrollYProgress, [0, 1], [0, 70])
   const glowScale = useTransform(scrollYProgress, [0, 1], [1, 1.15])
 
-  const NAME_PART_1 = 'Adja Aïcha'
-  const NAME_PART_2 = ' Diarra'
+  const NAME_PART_1 = 'Adja  Aïcha'
+  const NAME_PART_2 = '  Diarra'
   const fullName = NAME_PART_1 + NAME_PART_2
 
   const nameContainer = {
@@ -165,7 +165,7 @@ export default function Home() {
                 <img src={heroPhoto} alt="Aïcha" className="hero-photo" />
               ) : (
                 <span className="hero-photo-placeholder">
-                  Ta photo ici (à ajouter depuis /admin)
+  
                 </span>
               )}
             </motion.div>
@@ -204,24 +204,60 @@ export default function Home() {
               <span className="dot dot-yellow" />
               <span className="dot dot-green" />
             </div>
+
             <pre className="code-card-body">
               <code>
-                <span className="ln">01</span> <span className="code-kw">const</span>{' '}
+                <span className="ln">01</span>{' '}
+                <span className="code-kw">const</span>{' '}
                 <span className="code-var">developer</span> = {'{'}
                 {'\n'}
-                <span className="ln">02</span> {'  '}
+
+                <span className="ln">02</span>{'  '}
                 <span className="code-key">name</span>:{' '}
-                <span className="code-str">'Adja Aïcha Diarra'</span>,{'\n'}
-                <span className="ln">03</span> {'  '}
+                <span className="code-str">'Adja Aïcha Diarra'</span>,
+                {'\n'}
+
+                <span className="ln">03</span>{'  '}
                 <span className="code-key">role</span>:{' '}
-                <span className="code-str">'Développeuse Full-Stack'</span>,{'\n'}
-                <span className="ln">04</span> {'  '}
+                <span className="code-str">'Développeuse Full-Stack'</span>,
+                {'\n'}
+
+                <span className="ln">04</span>{'  '}
                 <span className="code-key">focus</span>:{' '}
-                <span className="code-str">'Web & Infographie'</span>,{'\n'}
-                <span className="ln">05</span> {'  '}
+                <span className="code-str">'Web, Design & Infographie'</span>,
+                {'\n'}
+
+                <span className="ln">05</span>{'  '}
+                <span className="code-key">stack</span>:{' '}
+                <span className="code-str">'React, Next.js, Node.js, PHP'</span>,
+                {'\n'}
+
+                <span className="ln">06</span>{'  '}
+                <span className="code-key">database</span>:{' '}
+                <span className="code-str">'MySQL, PostgreSQL, Supabase'</span>,
+                {'\n'}
+
+                <span className="ln">07</span>{'  '}
+                <span className="code-key">design</span>:{' '}
+                <span className="code-str">'Photoshop, Illustrator, Canva'</span>,
+                {'\n'}
+
+                <span className="ln">08</span>{'  '}
+                <span className="code-key">strengths</span>:{' '}
+                <span className="code-str">'Créativité, curiosité & rigueur'</span>,
+                {'\n'}
+
+                <span className="ln">09</span>{'  '}
+                <span className="code-key">vision</span>:{' '}
+                <span className="code-str">'Transformer les idées en solutions.'</span>,
+                {'\n'}
+
+                <span className="ln">10</span>{'  '}
                 <span className="code-key">location</span>:{' '}
-                <span className="code-str">"Bouaké, Côte d'Ivoire"</span>,{'\n'}
-                <span className="ln">06</span> {'}'}
+                <span className="code-str">"Côte d'Ivoire"</span>,
+                {'\n'}
+
+                <span className="ln">11</span>{'}'}
                 <span className="code-card-cursor">&nbsp;</span>
               </code>
             </pre>
@@ -252,7 +288,7 @@ export default function Home() {
       <section className="teaser wrap">
         <Reveal>
           <div className="section-head">
-            <h2>Projets — Développement</h2>
+            <h2>Projets Développement</h2>
             <Link to="/projets" className="eyebrow">
               Voir tous les projets →
             </Link>
@@ -303,7 +339,7 @@ export default function Home() {
       <section className="teaser wrap">
         <Reveal>
           <div className="section-head">
-            <h2>Projets — Infographie</h2>
+            <h2>Projets Infographie</h2>
             <Link to="/projets" className="eyebrow">
               Voir toute la galerie →
             </Link>
@@ -328,7 +364,7 @@ export default function Home() {
         <Reveal delay={0.2}>
           <div className="stat">
             <h3>L3</h3>
-            <p>en informatique, tout en dirigeant Athar</p>
+            <p>en Sciences informatiques</p>
           </div>
         </Reveal>
       </section>
