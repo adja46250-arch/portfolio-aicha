@@ -51,11 +51,6 @@ export default function Admin() {
   const [aboutUploading, setAboutUploading] = useState(false)
   const [aboutError, setAboutError] = useState('')
 
-  const [formations, setFormations] = useState([])
-  const EMPTY_FORMATION = { id: null, period: '', title: '', description: '' }
-  const [formationForm, setFormationForm] = useState(EMPTY_FORMATION)
-  const [formationError, setFormationError] = useState('')
-
   useEffect(() => {
     if (!isSupabaseConfigured) {
       setCheckingSession(false)
@@ -76,7 +71,6 @@ export default function Admin() {
       loadTestimonials()
       loadHeroImage()
       loadAboutImage()
-      loadFormations()
     }
   }, [session])
 
@@ -87,14 +81,6 @@ export default function Admin() {
       .eq('id', 1)
       .single()
     if (!error) setAboutImage(data?.about_image || '')
-  }
-
-  async function loadFormations() {
-    const { data, error } = await supabase
-      .from('formations')
-      .select('*')
-      .order('position', { ascending: true })
-    if (!error) setFormations(data || [])
   }
 
   async function loadHeroImage() {
@@ -347,58 +333,6 @@ export default function Admin() {
     setAboutImage(data.publicUrl)
     setAboutUploading(false)
     e.target.value = ''
-  }
-
-  function editFormation(f) {
-    setFormationForm({
-      id: f.id,
-      period: f.period || '',
-      title: f.title || '',
-      description: f.description || '',
-    })
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-
-  async function saveFormation(e) {
-    e.preventDefault()
-    setFormationError('')
-
-    const payload = {
-      period: formationForm.period.trim(),
-      title: formationForm.title.trim(),
-      description: formationForm.description.trim(),
-    }
-
-    const query = formationForm.id
-      ? supabase.from('formations').update(payload).eq('id', formationForm.id)
-      : supabase.from('formations').insert({ ...payload, position: formations.length })
-
-    const { error } = await query
-    if (error) {
-      setFormationError(error.message)
-      return
-    }
-    setFormationForm(EMPTY_FORMATION)
-    loadFormations()
-    flash(formationForm.id ? 'Formation mise à jour ✓' : 'Formation ajoutée ✓')
-  }
-
-  async function deleteFormation(id) {
-    if (!confirm('Supprimer cette formation ?')) return
-    const { error } = await supabase.from('formations').delete().eq('id', id)
-    if (!error) loadFormations()
-  }
-
-  async function moveFormation(index, direction) {
-    const target = index + direction
-    if (target < 0 || target >= formations.length) return
-    const a = formations[index]
-    const b = formations[target]
-    await Promise.all([
-      supabase.from('formations').update({ position: b.position }).eq('id', a.id),
-      supabase.from('formations').update({ position: a.position }).eq('id', b.id),
-    ])
-    loadFormations()
   }
 
   async function handleSave(e) {
@@ -1004,112 +938,6 @@ export default function Admin() {
               </div>
             </div>
           </div>
-
-          <form className="admin-card" onSubmit={saveFormation}>
-            <div className="admin-card-head">
-              <h2>{formationForm.id ? 'Modifier la formation' : 'Ajouter une formation'}</h2>
-              <span className="admin-hint">Collège, lycée, université, certificats…</span>
-            </div>
-            <div className="admin-fields">
-              <div className="field">
-                <label>Période</label>
-                <input
-                  required
-                  placeholder="Ex. 2021 — 2024, ou En cours"
-                  value={formationForm.period}
-                  onChange={(e) =>
-                    setFormationForm((f) => ({ ...f, period: e.target.value }))
-                  }
-                />
-              </div>
-              <div className="field">
-                <label>Titre</label>
-                <input
-                  required
-                  placeholder="Ex. Baccalauréat série D"
-                  value={formationForm.title}
-                  onChange={(e) =>
-                    setFormationForm((f) => ({ ...f, title: e.target.value }))
-                  }
-                />
-              </div>
-              <div className="field full">
-                <label>Description (optionnel)</label>
-                <textarea
-                  placeholder="Établissement, mention, détails..."
-                  value={formationForm.description}
-                  onChange={(e) =>
-                    setFormationForm((f) => ({ ...f, description: e.target.value }))
-                  }
-                />
-              </div>
-            </div>
-            <div className="admin-actions">
-              <button type="submit" className="btn btn-solid">
-                {formationForm.id ? 'Mettre à jour' : 'Ajouter'}
-              </button>
-              {formationForm.id && (
-                <button
-                  type="button"
-                  className="btn btn-line"
-                  onClick={() => setFormationForm(EMPTY_FORMATION)}
-                >
-                  Annuler
-                </button>
-              )}
-              {formationError && <p className="form-status error">{formationError}</p>}
-            </div>
-          </form>
-
-          <div className="admin-list-head">
-            <h2>Mes formations</h2>
-          </div>
-          {formations.length === 0 ? (
-            <p className="admin-empty">Aucune formation ajoutée pour l'instant.</p>
-          ) : (
-            <div className="admin-stack-list">
-              {formations.map((f, i) => (
-                <article key={f.id} className="admin-item">
-                  <div className="admin-item-top">
-                    <div className="admin-reorder">
-                      <button
-                        type="button"
-                        disabled={i === 0}
-                        onClick={() => moveFormation(i, -1)}
-                        aria-label="Monter"
-                      >
-                        ↑
-                      </button>
-                      <button
-                        type="button"
-                        disabled={i === formations.length - 1}
-                        onClick={() => moveFormation(i, 1)}
-                        aria-label="Descendre"
-                      >
-                        ↓
-                      </button>
-                    </div>
-                    <div className="admin-item-who">
-                      <strong>{f.title}</strong>
-                      <span>{f.period}</span>
-                    </div>
-                  </div>
-                  {f.description && <p className="admin-item-text">{f.description}</p>}
-                  <div className="admin-project-actions">
-                    <button className="btn btn-line" onClick={() => editFormation(f)}>
-                      Modifier
-                    </button>
-                    <button
-                      className="btn btn-line danger"
-                      onClick={() => deleteFormation(f.id)}
-                    >
-                      Supprimer
-                    </button>
-                  </div>
-                </article>
-              ))}
-            </div>
-          )}
         </>
       )}
 

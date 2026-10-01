@@ -3,15 +3,51 @@ import Reveal from '../components/Reveal'
 import { SkillIcons } from '../components/SkillIcons'
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient'
 
-// Repli affiché tant qu'aucune formation n'est ajoutée depuis l'admin
-// (onglet Parcours) ou si Supabase n'est pas encore configuré.
-const FALLBACK_FORMATIONS = [
+// Parcours affiché sur la page (modifiable ici, dans le code).
+const DEFAULT_FORMATIONS = [
   {
-    id: 'fallback',
-    period: 'En cours',
-    title: 'Licence 3 — Informatique',
+    id: 'licence',
+    period: '2023 — 2026',
+    title: 'Licence en Sciences Informatiques',
+    place: "Formation universitaire — Côte d'Ivoire",
     description:
-      "Formation en développement : PHP, Java, Laravel et JavaScript, complétée par des projets personnels.",
+      "Formation orientée vers la conception et le développement de solutions informatiques : programmation, bases de données, développement web, algorithmique, systèmes d'information et gestion de projets informatiques.",
+  },
+  {
+    id: 'lycee',
+    period: '2020 — 2023',
+    title: 'Lycée Technique de Bouaké',
+    place: 'Série F2 — Électronique',
+    description:
+      "La série F2 est une formation technique orientée vers l'électronique : étude des circuits électriques et électroniques, des composants, des systèmes automatisés et des principes qui permettent de comprendre et de concevoir des dispositifs électroniques.",
+    note:
+      "Cette formation m'a permis de développer une première culture technique, ma capacité à analyser des systèmes et mon goût pour les technologies.",
+  },
+  {
+    id: 'college',
+    period: 'Avant 2020',
+    title: 'Collège Al-Furqan — Bouaké',
+    place: 'Enseignement général — section franco-arabe',
+    description:
+      "Parcours scolaire dans un environnement franco-arabe, qui m'a permis de construire mes bases académiques avant de poursuivre une formation technique au Lycée Technique de Bouaké.",
+  },
+]
+
+// Formations complémentaires (hors cursus principal)
+const EXTRA_TRAININGS = [
+  {
+    tag: 'Certification',
+    title: 'YouthJob',
+    place: 'Entrepreneuriat • Soft skills • Recherche d\'emploi',
+    description:
+      "Certification axée sur des compétences professionnelles complémentaires : entrepreneuriat, communication, savoir-être professionnel, préparation à l'emploi et techniques de recherche d'opportunités.",
+  },
+  {
+    tag: 'Apprentissage continu',
+    title: 'Bootcamps & formations pratiques',
+    place: 'Renforcement technique et professionnel',
+    description:
+      "En complément de mon parcours académique, je participe à différents bootcamps et formations pratiques pour renforcer mes compétences techniques et rester en apprentissage continu.",
   },
 ]
 
@@ -47,7 +83,6 @@ const SKILLS = [
 
 export default function About() {
   const [photo, setPhoto] = useState('')
-  const [formations, setFormations] = useState(FALLBACK_FORMATIONS)
 
   useEffect(() => {
     if (!isSupabaseConfigured) return
@@ -59,14 +94,6 @@ export default function About() {
       .single()
       .then(({ data, error }) => {
         if (!error && data?.about_image) setPhoto(data.about_image)
-      })
-
-    supabase
-      .from('formations')
-      .select('*')
-      .order('position', { ascending: true })
-      .then(({ data, error }) => {
-        if (!error && data && data.length > 0) setFormations(data)
       })
   }, [])
 
@@ -85,13 +112,27 @@ export default function About() {
 
       <Reveal as="section" className="about-block wrap">
         <h2>Formation</h2>
+
+        <div className="parcours-intro">
+          <p className="parcours-lead">
+            Un parcours construit entre électronique, informatique et développement numérique.
+          </p>
+          <p>
+            Mon parcours académique m'a progressivement conduite de l'électronique vers les
+            sciences informatiques, avec une volonté constante de comprendre les technologies et
+            de les transformer en solutions concrètes.
+          </p>
+        </div>
+
         <div className="formation-layout">
           <ol className="timeline">
-            {formations.map((f) => (
+            {DEFAULT_FORMATIONS.map((f) => (
               <li key={f.id} className="timeline-item">
                 <span className="timeline-period">{f.period}</span>
                 <h3>{f.title}</h3>
+                {f.place && <span className="timeline-place">{f.place}</span>}
                 {f.description && <p>{f.description}</p>}
+                {f.note && <blockquote className="timeline-note">{f.note}</blockquote>}
               </li>
             ))}
           </ol>
@@ -104,6 +145,25 @@ export default function About() {
               <img src={photo} alt="Aïcha" className="formation-photo-img" />
             </div>
           )}
+        </div>
+
+        <p className="parcours-quote">
+          Mon parcours a commencé dans l'électronique avant d'évoluer naturellement vers les
+          sciences informatiques et le développement de solutions numériques.
+        </p>
+      </Reveal>
+
+      <Reveal as="section" className="about-block wrap">
+        <h2>Formations complémentaires</h2>
+        <div className="extra-grid">
+          {EXTRA_TRAININGS.map((t) => (
+            <article key={t.title} className="extra-card">
+              <span className="extra-tag">{t.tag}</span>
+              <h3>{t.title}</h3>
+              <span className="extra-place">{t.place}</span>
+              <p>{t.description}</p>
+            </article>
+          ))}
         </div>
       </Reveal>
 
