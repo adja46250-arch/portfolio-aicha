@@ -18,7 +18,7 @@ export default function Gallery() {
         <h1 className="anton">
           Galerie <span className="rose">infographie</span>
         </h1>
-        <p>Affiches, identités visuelles et compositions — réunies ici.</p>
+        <p>Affiches, identités visuelles et compositions réunies ici.</p>
       </section>
 
       <section className="projects-list wrap">

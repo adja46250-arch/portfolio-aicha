@@ -7,17 +7,17 @@ import { supabase, isSupabaseConfigured } from '../lib/supabaseClient'
 const DEFAULT_FORMATIONS = [
   {
     id: 'licence',
-    period: '2023 — 2026',
+    period: '2023-2026',
     title: 'Licence en Sciences Informatiques',
-    place: "Formation universitaire — Côte d'Ivoire",
+    place: "Groupe ITA (Institut des Technologies d'Abidjan) annexe Bouaké",
     description:
       "Formation orientée vers la conception et le développement de solutions informatiques : programmation, bases de données, développement web, algorithmique, systèmes d'information et gestion de projets informatiques.",
   },
   {
     id: 'lycee',
-    period: '2020 — 2023',
+    period: '2020-2023',
     title: 'Lycée Technique de Bouaké',
-    place: 'Série F2 — Électronique',
+    place: 'Série F2, Électronique',
     description:
       "La série F2 est une formation technique orientée vers l'électronique : étude des circuits électriques et électroniques, des composants, des systèmes automatisés et des principes qui permettent de comprendre et de concevoir des dispositifs électroniques.",
     note:
@@ -26,10 +26,28 @@ const DEFAULT_FORMATIONS = [
   {
     id: 'college',
     period: 'Avant 2020',
-    title: 'Collège Al-Furqan — Bouaké',
-    place: 'Enseignement général — section franco-arabe',
+    title: 'Collège Al-Fourqan, Bouaké',
+    place: 'Enseignement général',
     description:
       "Parcours scolaire dans un environnement franco-arabe, qui m'a permis de construire mes bases académiques avant de poursuivre une formation technique au Lycée Technique de Bouaké.",
+  },
+  {
+    id: 'college',
+    period: 'Avant 2020',
+    title: 'Collège Al-Fourqan, Bouaké',
+    place: 'Enseignement Langue arabe',
+    description:
+      "J’ai effectué mon parcours au Collège Al-Fourqan, un établissement franco-arabe, où j’ai obtenu mon BEPC. Cette formation m’a permis de développer mes bases scolaires tout en suivant un enseignement en sciences arabes et en langue arabe, avant de poursuivre mon parcours dans l’enseignement technique.",
+  },
+  {
+    id: 'infographie',
+    period: '2020-2026',
+    title: 'Infographie',
+    place: 'Apprentissage autodidacte',
+    description:
+      "L’infographie est un domaine que j’ai développé en autodidacte, principalement à travers des tutoriels, l’expérimentation et la réalisation de projets personnels. Au fil de ma pratique, j’ai appris à utiliser différents outils de création graphique et à travailler sur des supports tels que logos, affiches, flyers, visuels pour les réseaux sociaux et éléments d’identité visuelle.",
+    note:
+      "Apprendre en faisant, a toujours été ma manière de progresser : tester, créer, corriger et recommencer.",
   },
 ]
 
@@ -105,8 +123,7 @@ export default function About() {
           Mon <span className="rose">parcours</span>
         </h1>
         <p>
-          Étudiante en informatique, fondatrice d'agence, et attachée à faire aussi bien tourner
-          le code que porter une identité visuelle.
+          Je mêle logique du code et sens créatif pour concevoir des expériences numériques qui ont leur propre identité.
         </p>
       </section>
 
@@ -115,12 +132,11 @@ export default function About() {
 
         <div className="parcours-intro">
           <p className="parcours-lead">
-            Un parcours construit entre électronique, informatique et développement numérique.
+            Entre technique et créativité, un parcours guidé par l’envie de comprendre, d’apprendre et de créer.
           </p>
           <p>
-            Mon parcours académique m'a progressivement conduite de l'électronique vers les
-            sciences informatiques, avec une volonté constante de comprendre les technologies et
-            de les transformer en solutions concrètes.
+            Mon parcours s’est construit entre apprentissage académique, curiosité technique et pratique personnelle.
+            Au fil des années, j’ai développé un profil qui combine développement informatique et création visuelle. Ma formation m’a donné les bases techniques, tandis que mes apprentissages personnels et mes projets m’ont permis d’explorer d’autres domaines et de développer ma créativité.
           </p>
         </div>
 
@@ -189,7 +205,7 @@ export default function About() {
       <Reveal as="section" className="about-block wrap">
         <h2>En dehors du code</h2>
         <p>
-          Section à compléter — dis-moi ce que tu veux vraiment mettre ici (dessin, lecture,
+          Section à compléter dis-moi ce que tu veux vraiment mettre ici (dessin, lecture,
           autre chose) et je remplace ce texte par le tien depuis l'admin.
         </p>
       </Reveal>

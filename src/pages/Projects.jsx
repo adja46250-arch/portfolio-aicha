@@ -36,7 +36,7 @@ export default function Projects() {
         <p>
           Des applications construites du frontend à la base de données, et des identités
           visuelles pensées pour être comprises d'un coup d'œil. Certains sont en ligne, d'autres
-          encore en chantier — je préfère montrer où j'en suis vraiment.
+          encore en chantier. Je préfère montrer où j'en suis vraiment.
         </p>
 
         <div className="filters" role="tablist" aria-label="Filtrer les projets">

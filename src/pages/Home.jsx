@@ -229,7 +229,7 @@ export default function Home() {
 
                 <span className="ln">05</span>{'  '}
                 <span className="code-key">stack</span>:{' '}
-                <span className="code-str">'React, Next.js, Node.js, PHP'</span>,
+                <span className="code-str">'Java, Javascrip, React, PHP, Flutter,  '</span>,
                 {'\n'}
 
                 <span className="ln">06</span>{'  '}
