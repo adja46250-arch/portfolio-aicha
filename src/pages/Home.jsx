@@ -279,7 +279,7 @@ export default function Home() {
             <p className="about-teaser-tagline">Créer. Apprendre. Innover. Donner vie aux idées.</p>
 
             <Link to="/parcours" className="btn btn-line">
-              CV bientôt disponible ↓
+              Mon parcours
             </Link>
           </Reveal>
         </div>
@@ -290,7 +290,7 @@ export default function Home() {
           <div className="section-head">
             <h2>Projets Développement</h2>
             <Link to="/projets" className="eyebrow">
-              Voir tous les projets →
+              Voir tous les projets
             </Link>
           </div>
         </Reveal>
@@ -341,7 +341,7 @@ export default function Home() {
           <div className="section-head">
             <h2>Projets Infographie</h2>
             <Link to="/projets" className="eyebrow">
-              Voir toute la galerie →
+              Voir toute la galerie
             </Link>
           </div>
         </Reveal>
@@ -383,7 +383,7 @@ export default function Home() {
         <Reveal className="cta-band">
           <h2>Discutons de votre projet</h2>
           <div className="cta-contact">
-            <Link to="/contact">Envoyer un message →</Link>
+            <Link to="/contact">Envoyer un message</Link>
           </div>
         </Reveal>
       </section>

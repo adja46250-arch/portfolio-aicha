@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import Reveal from '../components/Reveal'
 import { SkillIcons } from '../components/SkillIcons'
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient'
@@ -32,7 +33,7 @@ const DEFAULT_FORMATIONS = [
       "Parcours scolaire dans un environnement franco-arabe, qui m'a permis de construire mes bases académiques avant de poursuivre une formation technique au Lycée Technique de Bouaké.",
   },
   {
-    id: 'college',
+    id: 'college-arabe',
     period: 'Avant 2020',
     title: 'Collège Al-Fourqan, Bouaké',
     place: 'Enseignement Langue arabe',
@@ -202,12 +203,12 @@ export default function About() {
         </div>
       </Reveal>
 
-      <Reveal as="section" className="about-block wrap">
+      <Reveal as="section" className="about-block wrap univers-teaser">
         <h2>En dehors du code</h2>
-        <p>
-          Section à compléter dis-moi ce que tu veux vraiment mettre ici (dessin, lecture,
-          autre chose) et je remplace ce texte par le tien depuis l'admin.
-        </p>
+        <p className="univers-lead">Derrière le code, il y a Aïcha.</p>
+        <Link to="/univers" className="univers-btn">
+          Découvrir mon univers
+        </Link>
       </Reveal>
     </main>
   )

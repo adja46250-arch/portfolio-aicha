@@ -43,4 +43,32 @@ export const SocialIcons = {
       />
     </svg>
   ),
+  whatsapp: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <path
+        d="M4 20l1.2-4.1A8 8 0 1 1 8.2 19L4 20Z"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M9.2 8.6c.2-.4.5-.4.8-.4.2 0 .4 0 .5.4l.7 1.6c.1.2 0 .4-.1.6l-.5.6c.8 1.4 1.8 2.3 3.3 3l.6-.7c.2-.2.4-.2.6-.1l1.6.8c.3.1.3.3.3.6-.1.9-.9 1.5-1.8 1.4-3-.4-5.6-2.9-6.2-5.7-.1-.7.1-1.5.3-2.1Z"
+        fill="currentColor"
+        stroke="none"
+      />
+    </svg>
+  ),
+  pin: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+      <path
+        d="M12 21s-6.5-5.6-6.5-11a6.5 6.5 0 1 1 13 0c0 5.4-6.5 11-6.5 11Z"
+        strokeLinejoin="round"
+      />
+      <circle cx="12" cy="10" r="2.3" />
+    </svg>
+  ),
+  arrow: (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8">
+      <path d="M5 12h14M13 6l6 6-6 6" strokeLinecap="round" strokeLinejoin="round" />
+    </svg>
+  ),
 }

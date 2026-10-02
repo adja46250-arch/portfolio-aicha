@@ -9,6 +9,10 @@ const EMPTY_FORM = {
   description: '',
   stack: '',
   link: '',
+  github: '',
+  problem: '',
+  solution: '',
+  result: '',
   image: '',
   images: [],
 }
@@ -170,6 +174,10 @@ export default function Admin() {
       description: p.description || '',
       stack: (p.stack || []).join(', '),
       link: p.link || '',
+      github: p.github || '',
+      problem: p.problem || '',
+      solution: p.solution || '',
+      result: p.result || '',
       image: p.image || '',
       images: p.images && p.images.length > 0 ? p.images : p.image ? [p.image] : [],
     })
@@ -352,6 +360,10 @@ export default function Admin() {
             .filter(Boolean)
         : [],
       link: isDev ? form.link : '',
+      github: isDev ? form.github : '',
+      problem: isDev ? form.problem : '',
+      solution: isDev ? form.solution : '',
+      result: isDev ? form.result : '',
       image: isDev ? form.images[0] || '' : form.image,
       images: isDev ? form.images : [],
     }
@@ -362,7 +374,12 @@ export default function Admin() {
 
     const { error } = await query
     if (error) {
-      setSavingError(error.message)
+      setSavingError(
+        /column|schema cache/i.test(error.message)
+          ? "Il manque les nouvelles colonnes dans Supabase : exécute d'abord le fichier projects-detail.sql (Supabase > SQL Editor). Détail : " +
+              error.message
+          : error.message,
+      )
       return
     }
     setForm(EMPTY_FORM)
@@ -568,6 +585,14 @@ export default function Admin() {
                       onChange={(e) => setForm((f) => ({ ...f, link: e.target.value }))}
                     />
                   </div>
+                  <div className="field">
+                    <label>Lien GitHub (optionnel)</label>
+                    <input
+                      value={form.github}
+                      placeholder="https://github.com/..."
+                      onChange={(e) => setForm((f) => ({ ...f, github: e.target.value }))}
+                    />
+                  </div>
                   <div className="field full">
                     <label>Description</label>
                     <textarea
@@ -582,6 +607,31 @@ export default function Admin() {
                       value={form.stack}
                       onChange={(e) => setForm((f) => ({ ...f, stack: e.target.value }))}
                       placeholder="React, Supabase, Tailwind"
+                    />
+                  </div>
+
+                  <div className="field full">
+                    <label>Le problème (page détail, optionnel)</label>
+                    <textarea
+                      value={form.problem}
+                      placeholder="Quel besoin ou quelle difficulté ce projet devait résoudre ?"
+                      onChange={(e) => setForm((f) => ({ ...f, problem: e.target.value }))}
+                    />
+                  </div>
+                  <div className="field full">
+                    <label>La solution (page détail, optionnel)</label>
+                    <textarea
+                      value={form.solution}
+                      placeholder="Comment tu l'as résolu : choix techniques, fonctionnalités clés…"
+                      onChange={(e) => setForm((f) => ({ ...f, solution: e.target.value }))}
+                    />
+                  </div>
+                  <div className="field full">
+                    <label>Le résultat (page détail, optionnel)</label>
+                    <textarea
+                      value={form.result}
+                      placeholder="Ce que le projet a apporté, ce que tu as appris, ce qui reste à faire…"
+                      onChange={(e) => setForm((f) => ({ ...f, result: e.target.value }))}
                     />
                   </div>
 

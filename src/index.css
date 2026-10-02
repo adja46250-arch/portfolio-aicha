@@ -3507,3 +3507,575 @@ footer.site {
     padding: 24px 22px 22px;
   }
 }
+
+/* =====================================================================
+   « En dehors du code » (page Parcours) + page « Mon univers »
+   ===================================================================== */
+
+/* --- Section sur la page Parcours : titre, accroche, bouton, tout centré --- */
+.univers-teaser {
+  text-align: center;
+}
+
+/* Le titre reste à gauche, comme « Compétences techniques » */
+.about-block.univers-teaser h2 {
+  text-align: left;
+}
+
+.about-block .univers-lead {
+  font-family: 'Anton', sans-serif;
+  text-transform: uppercase;
+  font-size: clamp(1.4rem, 3vw, 2.2rem);
+  line-height: 1.2;
+  color: var(--cream);
+  margin: 8px auto 30px;
+  text-wrap: balance;
+}
+
+.univers-btn {
+  display: inline-block;
+  background: var(--rose);
+  color: var(--bg-2);
+  padding: 16px 30px;
+  border-radius: 999px;
+  font-size: 1rem;
+  font-weight: 600;
+  white-space: nowrap;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.univers-btn:hover {
+  background: var(--rose-deep);
+  transform: scale(1.05);
+}
+
+/* --- Page « Mon univers » --- */
+.univers-section {
+  padding: 0 0 70px;
+}
+
+/* 3 cartes par ligne ; la dernière ligne est centrée */
+.univers-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+}
+
+.univers-card {
+  flex: 0 0 calc((100% - 40px) / 3);
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background:
+    radial-gradient(120% 90% at 0% 0%, rgba(242, 165, 142, 0.1), transparent 60%),
+    var(--bg-2);
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+
+.univers-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(242, 165, 142, 0.4);
+}
+
+.univers-photo {
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
+.univers-card-body {
+  padding: 26px 24px 24px;
+}
+
+.univers-icon {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  margin-bottom: 16px;
+  border: 1px solid rgba(242, 165, 142, 0.3);
+  border-radius: 12px;
+  background: rgba(242, 165, 142, 0.08);
+  color: var(--rose);
+}
+
+.univers-icon svg {
+  width: 22px;
+  height: 22px;
+}
+
+.univers-card h3 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+
+.univers-card p {
+  color: var(--muted);
+  font-size: 0.95rem;
+  line-height: 1.7;
+}
+
+.univers-back {
+  margin-top: 44px;
+  text-align: center;
+}
+
+@media (max-width: 1000px) {
+  .univers-card {
+    flex-basis: calc((100% - 20px) / 2);
+  }
+}
+
+@media (max-width: 820px) {
+  .univers-section {
+    padding-left: 22px !important;
+    padding-right: 22px !important;
+  }
+}
+
+@media (max-width: 640px) {
+  .univers-grid {
+    gap: 14px;
+  }
+  .univers-card {
+    flex-basis: 100%;
+  }
+  .univers-card-body {
+    padding: 22px 20px 20px;
+  }
+  .univers-section {
+    padding-bottom: 50px;
+  }
+}
+
+
+/* =====================================================================
+   PAGE DÉTAIL D'UN PROJET (/projets/:id)
+   ===================================================================== */
+.project-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 22px;
+}
+
+.detail-back {
+  display: block;
+  width: fit-content;
+  margin-bottom: 26px;
+}
+
+.detail-hero .status {
+  display: inline-block;
+  margin-bottom: 14px;
+}
+
+.detail-hero .stack-row {
+  margin-top: 22px;
+}
+
+.detail-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 28px;
+}
+
+.detail-back-link {
+  display: inline-block;
+  margin-top: 24px;
+}
+
+.detail-shots,
+.detail-story,
+.detail-cta {
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.detail-shots {
+  padding-bottom: 20px;
+}
+
+.detail-shots .project-mock-frame {
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: var(--bg-2);
+}
+
+.detail-shot {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.detail-thumbs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.detail-thumb {
+  width: 92px;
+  aspect-ratio: 16 / 10;
+  padding: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--bg-2);
+  opacity: 0.6;
+  cursor: pointer;
+  transition: opacity 0.2s ease, border-color 0.2s ease;
+}
+
+.detail-thumb img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.detail-thumb:hover,
+.detail-thumb.is-active {
+  opacity: 1;
+  border-color: var(--rose);
+}
+
+.detail-story {
+  padding-top: 30px;
+}
+
+.detail-step {
+  display: grid;
+  grid-template-columns: 240px 1fr;
+  gap: 12px 40px;
+  padding: 34px 0;
+  border-top: 1px solid var(--line);
+}
+
+.detail-step-head {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+}
+
+.detail-step-num {
+  font-family: 'Anton', sans-serif;
+  font-size: 1.1rem;
+  color: var(--rose);
+}
+
+.detail-step h2 {
+  font-family: 'Anton', sans-serif;
+  text-transform: uppercase;
+  font-size: clamp(1.3rem, 2.4vw, 1.7rem);
+}
+
+.detail-step p {
+  color: var(--muted);
+  line-height: 1.8;
+  font-size: 1.02rem;
+  max-width: 70ch;
+  white-space: pre-line;
+}
+
+.detail-cta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 18px;
+  padding-top: 30px;
+  padding-bottom: 70px;
+}
+
+.detail-cta p {
+  font-family: 'Anton', sans-serif;
+  text-transform: uppercase;
+  font-size: clamp(1.3rem, 3vw, 1.9rem);
+  color: var(--cream);
+}
+
+@media (max-width: 820px) {
+  .detail-step {
+    grid-template-columns: 1fr;
+    padding: 26px 0;
+  }
+  .detail-thumb {
+    width: 72px;
+  }
+  .detail-actions .btn {
+    width: 100%;
+    text-align: center;
+  }
+  .detail-cta {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .detail-hero,
+  .detail-shots,
+  .detail-story,
+  .detail-cta {
+    padding-left: 22px !important;
+    padding-right: 22px !important;
+  }
+}
+
+
+/* =====================================================================
+   PAGE CONTACT — nouvelle mise en page
+   ===================================================================== */
+.contact-grid {
+  grid-template-columns: 1.15fr 1fr;
+  grid-template-areas:
+    'form wa'
+    'form info';
+  grid-template-rows: auto 1fr;
+  gap: 22px 40px;
+  align-items: start;
+}
+
+.ct-area-form {
+  grid-area: form;
+}
+
+.ct-area-wa {
+  grid-area: wa;
+}
+
+.ct-area-info {
+  grid-area: info;
+}
+
+.ct-title {
+  font-family: 'Anton', sans-serif;
+  text-transform: uppercase;
+  font-size: 1.15rem;
+  letter-spacing: 0.02em;
+}
+
+/* --- Carte WhatsApp (action principale) --- */
+.wa-card {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 22px 24px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--rose), var(--rose-deep));
+  color: var(--bg-2);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.35);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+
+.wa-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 22px 46px rgba(0, 0, 0, 0.45);
+}
+
+.wa-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: var(--bg-2);
+  color: var(--rose);
+}
+
+.wa-icon svg {
+  width: 26px;
+  height: 26px;
+}
+
+.wa-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  min-width: 0;
+}
+
+.wa-text strong {
+  font-size: 1.1rem;
+  font-weight: 700;
+}
+
+.wa-text small {
+  font-size: 0.86rem;
+  opacity: 0.8;
+}
+
+.wa-arrow {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  border: 1.5px solid rgba(15, 6, 7, 0.35);
+  transition: transform 0.25s ease;
+}
+
+.wa-arrow svg {
+  width: 18px;
+  height: 18px;
+}
+
+.wa-card:hover .wa-arrow {
+  transform: translateX(4px);
+}
+
+/* --- Coordonnées : lignes compactes + réseaux en pastilles --- */
+.ct-info {
+  padding: 8px 24px 24px;
+  background:
+    radial-gradient(120% 90% at 0% 0%, rgba(242, 165, 142, 0.08), transparent 60%),
+    var(--bg-2);
+  border: 1px solid var(--line);
+  border-radius: 14px;
+}
+
+.ct-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--line);
+  color: var(--cream);
+}
+
+.ct-row-icon {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border: 1px solid rgba(242, 165, 142, 0.3);
+  border-radius: 12px;
+  background: rgba(242, 165, 142, 0.08);
+  color: var(--rose);
+}
+
+.ct-row-icon svg {
+  width: 20px;
+  height: 20px;
+}
+
+.ct-row-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.ct-row-text small {
+  font-size: 0.74rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.ct-row-text strong {
+  font-size: 0.98rem;
+  font-weight: 500;
+  overflow-wrap: anywhere;
+}
+
+.ct-row-arrow {
+  flex: none;
+  color: var(--rose);
+  opacity: 0;
+  transform: translateX(-6px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+}
+
+.ct-row-arrow svg {
+  width: 18px;
+  height: 18px;
+}
+
+a.ct-row:hover .ct-row-arrow {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+.ct-info .ct-row:last-child {
+  border-bottom: 0;
+}
+
+.ct-socials {
+  padding-top: 22px;
+}
+
+.ct-socials-title {
+  display: block;
+  margin-bottom: 14px;
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.ct-social-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.ct-social {
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 1px solid var(--line);
+  border-radius: 50%;
+  color: var(--cream);
+  transition: transform 0.25s ease, background 0.25s ease, color 0.25s ease, border-color 0.25s ease;
+}
+
+.ct-social svg {
+  width: 21px;
+  height: 21px;
+}
+
+.ct-social:hover {
+  transform: translateY(-3px);
+  background: var(--rose);
+  border-color: var(--rose);
+  color: var(--bg-2);
+}
+
+/* --- Mobile : WhatsApp d'abord, puis le formulaire, puis les coordonnées --- */
+@media (max-width: 820px) {
+  .contact-grid {
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      'wa'
+      'form'
+      'info';
+    grid-template-rows: none;
+    gap: 18px;
+  }
+  .wa-card {
+    padding: 18px 18px;
+    gap: 14px;
+  }
+  .wa-icon {
+    width: 46px;
+    height: 46px;
+  }
+  .wa-text strong {
+    font-size: 1.02rem;
+  }
+  .ct-info {
+    padding: 4px 20px 22px;
+  }
+}

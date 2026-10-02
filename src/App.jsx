@@ -5,7 +5,9 @@ import Footer from './components/Footer'
 import Home from './pages/Home'
 import Projects from './pages/Projects'
 import Gallery from './pages/Gallery'
+import ProjectDetail from './pages/ProjectDetail'
 import About from './pages/About'
+import Universe from './pages/Universe'
 import Contact from './pages/Contact'
 import Admin from './pages/Admin'
 
@@ -35,12 +37,19 @@ export default function App() {
   return (
     <>
       <Header />
-      <AnimatePresence mode="wait">
+      <AnimatePresence
+        mode="wait"
+        onExitComplete={() =>
+          window.scrollTo({ top: 0, left: 0, behavior: 'instant' })
+        }
+      >
         <Routes location={location} key={location.pathname}>
           <Route path="/" element={<Page><Home /></Page>} />
           <Route path="/projets" element={<Page><Projects /></Page>} />
           <Route path="/projets/galerie" element={<Page><Gallery /></Page>} />
+          <Route path="/projets/:id" element={<Page><ProjectDetail /></Page>} />
           <Route path="/parcours" element={<Page><About /></Page>} />
+          <Route path="/univers" element={<Page><Universe /></Page>} />
           <Route path="/contact" element={<Page><Contact /></Page>} />
           <Route path="/admin" element={<Page><Admin /></Page>} />
         </Routes>

@@ -3,12 +3,18 @@ import { supabase, isSupabaseConfigured } from '../lib/supabaseClient'
 import Reveal from '../components/Reveal'
 import { SocialIcons } from '../components/SocialIcons'
 
-// Mets tes vrais liens ici dès que tu les as. Un badge ne s'affiche que si
-// son lien n'est pas vide — pas besoin de retirer une ligne, laisse-la à ''.
+// ---- Tes coordonnées : modifie ici ------------------------------------
+// Numéro WhatsApp avec l'indicatif du pays, sans le "+" (ex. "225 07 00 00 00 00").
+// Tant que ce champ est vide, la carte WhatsApp ne s'affiche pas.
+const WHATSAPP_NUMBER = '225 0142396729'
+const WHATSAPP_MESSAGE = "Bonjour Aïcha, j'ai vu ton portfolio et j'aimerais discuter d'un projet."
+
+const EMAIL = 'adja46250@gmail.com'
+
+// Un bouton ne s'affiche que si son lien n'est pas vide : laisse '' pour le masquer.
 const SOCIAL_LINKS = [
-  { key: 'email', label: 'Email', href: 'mailto:hello@aicha.com' },
-  { key: 'linkedin', label: 'LinkedIn', href: '' },
-  { key: 'github', label: 'GitHub', href: '' },
+  { key: 'linkedin', label: 'LinkedIn', href: 'www.linkedin.com/in/adja-aïcha-diarra-b68701386' },
+  { key: 'github', label: 'GitHub', href: 'https://github.com/adja46250-arch' },
   { key: 'tiktok', label: 'TikTok', href: '' },
   { key: 'facebook', label: 'Facebook', href: '' },
 ]
@@ -46,6 +52,10 @@ export default function Contact() {
   }
 
   const links = SOCIAL_LINKS.filter((s) => s.href)
+  const waDigits = WHATSAPP_NUMBER.replace(/\D/g, '')
+  const waHref = waDigits
+    ? `https://wa.me/${waDigits}?text=${encodeURIComponent(WHATSAPP_MESSAGE)}`
+    : ''
 
   return (
     <main>
@@ -61,7 +71,21 @@ export default function Contact() {
       </section>
 
       <section className="contact-grid wrap">
-        <form className="contact-form contact-form-card" onSubmit={handleSubmit}>
+        {waHref && (
+          <Reveal as="div" className="ct-area-wa">
+            <a href={waHref} target="_blank" rel="noreferrer" className="wa-card">
+              <span className="wa-icon">{SocialIcons.whatsapp}</span>
+              <span className="wa-text">
+                <strong>Écris-moi sur WhatsApp</strong>
+                <small>Le moyen le plus rapide de me joindre</small>
+              </span>
+              <span className="wa-arrow">{SocialIcons.arrow}</span>
+            </a>
+          </Reveal>
+        )}
+
+        <form className="contact-form contact-form-card ct-area-form" onSubmit={handleSubmit}>
+          <h3 className="ct-title">Envoyer un message</h3>
           <div className="field">
             <label htmlFor="name">Nom</label>
             <input
@@ -107,30 +131,44 @@ export default function Contact() {
           )}
         </form>
 
-        <Reveal as="div" className="contact-side" delay={0.1}>
-          <div className="contact-card">
-            <h3>Autres façons de me joindre</h3>
-            <p className="contact-location">
-              <span aria-hidden="true"></span> Bouaké, Côte d'Ivoire
-            </p>
+        <Reveal as="div" className="ct-area-info" delay={0.1}>
+          <div className="ct-info">
+            <a href={`mailto:${EMAIL}`} className="ct-row">
+              <span className="ct-row-icon">{SocialIcons.email}</span>
+              <span className="ct-row-text">
+                <small>Email</small>
+                <strong>{EMAIL}</strong>
+              </span>
+              <span className="ct-row-arrow">{SocialIcons.arrow}</span>
+            </a>
 
-            {links.length > 0 ? (
-              <div className="social-grid">
-                {links.map((s) => (
-                  <a
-                    key={s.key}
-                    href={s.href}
-                    target={s.key === 'email' ? undefined : '_blank'}
-                    rel={s.key === 'email' ? undefined : 'noreferrer'}
-                    className="social-link"
-                  >
-                    <span className="social-icon">{SocialIcons[s.key]}</span>
-                    {s.label}
-                  </a>
-                ))}
+            <div className="ct-row ct-row-static">
+              <span className="ct-row-icon">{SocialIcons.pin}</span>
+              <span className="ct-row-text">
+                <small>Basée à</small>
+                <strong>Bouaké, Côte d'Ivoire</strong>
+              </span>
+            </div>
+
+            {links.length > 0 && (
+              <div className="ct-socials">
+                <span className="ct-socials-title">Me retrouver aussi</span>
+                <div className="ct-social-row">
+                  {links.map((l) => (
+                    <a
+                      key={l.key}
+                      href={l.href}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="ct-social"
+                      aria-label={l.label}
+                      title={l.label}
+                    >
+                      {SocialIcons[l.key]}
+                    </a>
+                  ))}
+                </div>
               </div>
-            ) : (
-              <p className="contact-hint">Mes liens arrivent bientôt.</p>
             )}
           </div>
         </Reveal>

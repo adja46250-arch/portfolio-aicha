@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useProjects } from '../lib/useProjects'
 import Reveal from '../components/Reveal'
@@ -107,16 +108,21 @@ export default function Projects() {
                             </span>
                           ))}
                         </div>
-                        {p.link && (
-                          <a
-                            href={p.link}
-                            className="project-link"
-                            target="_blank"
-                            rel="noreferrer"
-                          >
-                            Voir le site en ligne →
-                          </a>
-                        )}
+                        <div className="project-links">
+                          <Link to={`/projets/${p.id}`} className="project-link">
+                            Voir le détail →
+                          </Link>
+                          {p.link && (
+                            <a
+                              href={p.link}
+                              className="project-link"
+                              target="_blank"
+                              rel="noreferrer"
+                            >
+                              Voir le site en ligne →
+                            </a>
+                          )}
+                        </div>
                       </div>
                     </Reveal>
                   )
