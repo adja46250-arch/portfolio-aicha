@@ -1,5 +1,7 @@
+import { useEffect } from 'react'
 import { Link } from 'react-router-dom'
 import Reveal from '../components/Reveal'
+import StarSky from '../components/StarSky'
 
 const ICONS = {
   dessin: (
@@ -62,18 +64,36 @@ const PASSIONS = [
     text: "Cadrage, lumière, ambiance : j'y puise beaucoup d'inspiration.",
     image: '',
   },
-  {
-    icon: 'manga',
-    title: 'Mangas',
-    text: 'Un univers visuel et narratif qui me suit depuis toujours.',
-    image: '',
-  },
+]
+
+// Cartes qui défilent dans la section Mangas.
+// Pour mettre une vraie image : place-la dans "public/univers/" puis écris son chemin
+// dans "image" (ex. '/univers/manga-1.jpg'). "title" est facultatif.
+const MANGAS = [
+  { title: '', image: '' },
+  { title: '', image: '' },
+  { title: '', image: '' },
+  { title: '', image: '' },
+  { title: '', image: '' },
+  { title: '', image: '' },
 ]
 
 export default function Universe() {
+  // Fond sombre + en-tête/pied de page assortis tant qu'on est sur cette page
+  useEffect(() => {
+    document.body.classList.add('is-universe')
+    return () => document.body.classList.remove('is-universe')
+  }, [])
+
   return (
-    <main>
-      <section className="page-hero wrap">
+    <main className="universe-page">
+      <StarSky />
+
+      <section className="page-hero wrap universe-hero">
+        <span className="spark spark-1" aria-hidden="true" />
+        <span className="spark spark-2" aria-hidden="true" />
+        <span className="spark spark-3" aria-hidden="true" />
+        <span className="spark spark-4" aria-hidden="true" />
         <p className="eyebrow">En dehors du code</p>
         <h1 className="anton">
           Mon <span className="rose">univers</span>
@@ -81,7 +101,46 @@ export default function Universe() {
         <p>Ce qui nourrit ma créativité quand l'écran s'éteint.</p>
       </section>
 
+      <section className="manga-section">
+        <div className="wrap manga-head">
+          <p className="eyebrow">Ma passion</p>
+          <h2 className="anton">Mangas</h2>
+          <p>
+            Ma passion pour les mangas ne m'a jamais quittée. Leurs images, leurs émotions et leurs
+            mondes imaginaires nourrissent ma créativité, mon sens du détail et ma façon de raconter
+            une histoire.
+          </p>
+        </div>
+
+        <div className="manga-marquee" style={{ '--dur': `${MANGAS.length * 7}s` }}>
+          <div className="manga-track">
+            {[...MANGAS, ...MANGAS].map((m, i) => (
+              <article
+                key={i}
+                className={`manga-card manga-card-${(i % MANGAS.length) + 1}`}
+                aria-hidden={i >= MANGAS.length}
+              >
+                {m.image ? (
+                  <img src={m.image} alt={m.title || 'Manga'} loading="lazy" />
+                ) : (
+                  <span className="manga-card-empty">
+                    <span className="spark spark-card" aria-hidden="true" />
+                    <small>Bientôt</small>
+                  </span>
+                )}
+                {m.title && <span className="manga-card-title">{m.title}</span>}
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <Reveal as="section" className="wrap univers-section">
+        <div className="univers-intro">
+          <p className="eyebrow">Et aussi</p>
+          <h2 className="anton">Mes autres passions</h2>
+        </div>
+
         <div className="univers-grid">
           {PASSIONS.map((p) => (
             <article key={p.title} className="univers-card">
