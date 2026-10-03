@@ -8,6 +8,7 @@ import Gallery from './pages/Gallery'
 import ProjectDetail from './pages/ProjectDetail'
 import About from './pages/About'
 import Universe from './pages/Universe'
+import DrawingGallery from './pages/DrawingGallery'
 import Contact from './pages/Contact'
 import Admin from './pages/Admin'
 
@@ -50,6 +51,7 @@ export default function App() {
           <Route path="/projets/:id" element={<Page><ProjectDetail /></Page>} />
           <Route path="/parcours" element={<Page><About /></Page>} />
           <Route path="/univers" element={<Page><Universe /></Page>} />
+          <Route path="/univers/dessins" element={<Page><DrawingGallery /></Page>} />
           <Route path="/contact" element={<Page><Contact /></Page>} />
           <Route path="/admin" element={<Page><Admin /></Page>} />
         </Routes>
