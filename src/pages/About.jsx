@@ -4,6 +4,10 @@ import Reveal from '../components/Reveal'
 import { SkillIcons } from '../components/SkillIcons'
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient'
 
+// Ton CV : mets le fichier PDF dans le dossier "public/cv/" avec exactement ce nom
+// (ou change le chemin ci-dessous si ton fichier s'appelle autrement).
+const CV_URL = '/cv/CV-Aicha-Diarra.pdf'
+
 // Parcours affiché sur la page (modifiable ici, dans le code).
 const DEFAULT_FORMATIONS = [
   {
@@ -203,11 +207,43 @@ export default function About() {
         </div>
       </Reveal>
 
+      <Reveal as="section" className="about-block wrap cv-block">
+        <div className="cv-card">
+          <div className="cv-sheet" aria-hidden="true">
+            <span className="cv-sheet-photo" />
+            <span className="cv-sheet-name" />
+            <span className="cv-sheet-role" />
+            <span className="cv-sheet-line" />
+            <span className="cv-sheet-line short" />
+            <span className="cv-sheet-line" />
+            <span className="cv-sheet-line short" />
+            <span className="cv-sheet-line" />
+          </div>
+          <div className="cv-text">
+            <p className="eyebrow">Tout sur une page</p>
+            <h2>Mon CV</h2>
+            <p>Formation, compétences, projets : l'essentiel de mon parcours, à garder ou à partager.</p>
+            <div className="cv-actions">
+              <a className="cv-btn cv-btn-main" href={CV_URL} download="CV-Aicha-Diarra.pdf">
+                Télécharger mon CV
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <path d="M12 3v12M7 10l5 5 5-5M5 21h14" />
+                </svg>
+              </a>
+              <a className="cv-btn" href={CV_URL} target="_blank" rel="noopener noreferrer">
+                Voir en ligne
+              </a>
+            </div>
+            <small className="cv-meta">PDF</small>
+          </div>
+        </div>
+      </Reveal>
+
       <Reveal as="section" className="about-block wrap univers-teaser">
         <h2>En dehors du code</h2>
         <p className="univers-lead">Derrière le code, il y a Aïcha.</p>
         <Link to="/univers" className="univers-btn">
-          Découvrir mon univers
+          Découvrir mon univers →
         </Link>
       </Reveal>
     </main>

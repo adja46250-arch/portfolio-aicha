@@ -3,60 +3,15 @@ import { Link } from 'react-router-dom'
 import Reveal from '../components/Reveal'
 import StarSky from '../components/StarSky'
 import TypeIntro from '../components/TypeIntro'
-import { DRAWINGS } from '../data/drawings'
+import { useWorkingDrawings } from '../lib/useWorkingDrawings'
 import { SHELVES } from '../data/books'
 import BookShelf from '../components/BookShelf'
-
-const ICONS = {
-  dessin: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M12 20h9" />
-      <path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z" />
-    </svg>
-  ),
-  maquillage: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M8 21v-6h8v6" />
-      <path d="M9 15V9h6v6" />
-      <path d="M10 9l1-6 3 1-1 5" />
-    </svg>
-  ),
-  lecture: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H20v16H6.5A2.5 2.5 0 0 0 4 21.5Z" />
-      <path d="M4 5.5v16" />
-    </svg>
-  ),
-  films: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <rect x="3" y="4" width="18" height="16" rx="2" />
-      <path d="M7 4v16M17 4v16M3 9h4M3 15h4M17 9h4M17 15h4" />
-    </svg>
-  ),
-  manga: (
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-      <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8Z" />
-      <path d="M19 16l.7 1.8L21.5 18.5l-1.8.7L19 21l-.7-1.8-1.8-.7 1.8-.7Z" />
-    </svg>
-  ),
-}
-
-// Pour ajouter une photo à une carte : mets l'image dans le dossier "public/univers/"
-// puis renseigne son chemin dans "image", par exemple : image: '/univers/dessin.jpg'
-const PASSIONS = [
-  {
-    icon: 'maquillage',
-    title: 'Maquillage',
-    text: 'Couleurs, harmonies, détails : un autre terrain de création.',
-    image: '',
-  },
-  {
-    icon: 'films',
-    title: 'Films',
-    text: "Cadrage, lumière, ambiance : j'y puise beaucoup d'inspiration.",
-    image: '',
-  },
-]
+import HenneSection from '../components/HenneSection'
+import CrochetCorner from '../components/CrochetCorner'
+import TravelSection from '../components/TravelSection'
+import UniverseOutro from '../components/UniverseOutro'
+import SpaceProgress from '../components/SpaceProgress'
+import StarTrail from '../components/StarTrail'
 
 // Cartes qui défilent dans la section Mangas.
 // Pour mettre une vraie image : place-la dans "public/univers/" puis écris son chemin
@@ -74,14 +29,13 @@ const MANGAS = [
 ]
 
 // On répète la liste si elle est courte, pour que le défilement ne laisse jamais de vide.
-// (Tes dessins se gèrent dans src/data/drawings.js : les 8 premiers défilent ici.)
-const PREVIEW = DRAWINGS.slice(0, 8)
-const SKETCHES =
-  PREVIEW.length >= 6
-    ? PREVIEW
-    : Array.from({ length: 6 }, (_, i) => PREVIEW[i % PREVIEW.length])
-
 export default function Universe() {
+  // Dessins : les 10 premiers défilent (liste répétée si elle est courte, pour ne jamais laisser de vide)
+  const { list: drawings, onError: onDrawingError } = useWorkingDrawings()
+  const preview = drawings.slice(0, 10)
+  const SKETCHES =
+    preview.length >= 6 ? preview : Array.from({ length: 6 }, (_, i) => preview[i % preview.length])
+
   // Fond sombre + en-tête/pied de page assortis tant qu'on est sur cette page
   useEffect(() => {
     document.body.classList.add('is-universe')
@@ -91,6 +45,8 @@ export default function Universe() {
   return (
     <main className="universe-page">
       <StarSky />
+      <StarTrail />
+      <SpaceProgress />
 
       <section className="page-hero wrap universe-hero">
         <span className="spark spark-1" aria-hidden="true" />
@@ -132,7 +88,7 @@ export default function Universe() {
           </p>
         </div>
 
-        <div className="manga-marquee" style={{ '--dur': `${MANGAS.length * 7}s` }}>
+        <div className="manga-marquee" style={{ '--dur': `${MANGAS.length * 4}s` }}>
           <div className="manga-track">
             {[...MANGAS, ...MANGAS].map((m, i) => (
               <article
@@ -172,7 +128,12 @@ export default function Universe() {
                 aria-hidden={i >= SKETCHES.length}
               >
                 {d.image ? (
-                  <img src={d.image} alt={d.title || 'Dessin'} loading="eager" />
+                  <img
+                    src={d.image}
+                    alt={d.title || 'Dessin'}
+                    loading="eager"
+                    onError={() => onDrawingError(d.image)}
+                  />
                 ) : (
                   <span className="sketch-empty" aria-hidden="true">
                     <span className="sketch-lines" />
@@ -214,33 +175,14 @@ export default function Universe() {
         </div>
       </Reveal>
 
-      <Reveal as="section" className="wrap univers-section">
-        <div className="univers-intro">
-          <p className="eyebrow">Et aussi</p>
-          <h2 className="anton">Mes autres passions</h2>
-        </div>
 
-        <div className="univers-grid">
-          {PASSIONS.map((p) => (
-            <article key={p.title} className="univers-card">
-              {p.image && (
-                <img src={p.image} alt={p.title} className="univers-photo" loading="lazy" />
-              )}
-              <div className="univers-card-body">
-                <span className="univers-icon">{ICONS[p.icon]}</span>
-                <h3>{p.title}</h3>
-                <p>{p.text}</p>
-              </div>
-            </article>
-          ))}
-        </div>
+      <HenneSection />
 
-        <div className="univers-back">
-          <Link to="/parcours" className="eyebrow">
-            ← Retour au parcours
-          </Link>
-        </div>
-      </Reveal>
+      <CrochetCorner />
+
+      <TravelSection />
+
+      <UniverseOutro />
     </main>
   )
 }

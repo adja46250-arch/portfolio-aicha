@@ -4764,3 +4764,1626 @@ body.is-universe footer.site {
 .shelf {
   min-width: 0;
 }
+
+
+
+/* =====================================================================
+   « Mon univers » — Hobby n°5 : Ink (tatouage)
+   ===================================================================== */
+.ink-section {
+  position: relative;
+  padding: 30px 0 70px;
+}
+.ink-head {
+  max-width: 1180px;
+  padding-left: 0;
+  padding-right: 0;
+}
+.ink-head h2 {
+  font-size: clamp(2.4rem, 6vw, 4.4rem);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--cream);
+  margin: 0 0 18px;
+}
+
+/* Grand panneau noir, comme une planche de flash */
+.ink-panel {
+  position: relative;
+  padding: clamp(36px, 6vw, 70px) 0 clamp(30px, 5vw, 56px);
+  background:
+    radial-gradient(60% 80% at 50% 0%, rgba(233, 196, 106, 0.07), transparent 70%),
+    #05020a;
+  border-top: 1px solid rgba(233, 196, 106, 0.22);
+  border-bottom: 1px solid rgba(233, 196, 106, 0.22);
+}
+.ink-center {
+  text-align: center;
+  padding-bottom: clamp(26px, 4vw, 44px);
+}
+.ink-line {
+  margin: 0 auto;
+  max-width: 20ch;
+  font-family: 'Anton', sans-serif;
+  text-transform: uppercase;
+  font-size: clamp(1.8rem, 4.4vw, 3.4rem);
+  line-height: 1.12;
+  letter-spacing: 0.01em;
+  color: var(--cream);
+}
+.ink-tags {
+  margin: 18px 0 0;
+  font-size: 0.8rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold-soft);
+}
+
+.ink-flash {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(12px, 2vw, 22px);
+}
+.ink-card {
+  margin: 0;
+  padding: 14px 14px 12px;
+  border: 1px solid rgba(247, 236, 226, 0.16);
+  border-radius: 6px;
+  background: rgba(247, 236, 226, 0.02);
+  transition: border-color 0.3s ease, transform 0.3s ease;
+}
+@media (hover: hover) {
+  .ink-card:hover {
+    border-color: rgba(233, 196, 106, 0.6);
+    transform: translateY(-4px);
+  }
+}
+.ink-card svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  fill: none;
+  stroke: var(--cream);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+.ink-card svg * {
+  stroke-dasharray: 1;
+  stroke-dashoffset: 1;
+}
+.ink-card img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 3px;
+}
+.ink-card figcaption {
+  display: grid;
+  gap: 2px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(247, 236, 226, 0.12);
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--cream);
+}
+.ink-card figcaption small {
+  font-size: 0.64rem;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold-soft);
+}
+/* Les traits se dessinent */
+.ink-flash.is-in .ink-card svg * {
+  animation: ink-draw 2.4s ease forwards;
+  animation-delay: var(--d, 0s);
+}
+.ink-flash.is-in .ink-card svg circle[stroke-dasharray] {
+  stroke-dasharray: 1 4;
+}
+@keyframes ink-draw {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* Réalisations (facultatif) */
+.ink-real {
+  padding-top: clamp(34px, 5vw, 56px);
+}
+.ink-real-title {
+  display: block;
+  margin-bottom: 18px;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.24em;
+  text-transform: uppercase;
+  color: var(--gold-soft);
+}
+.ink-real-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+}
+
+/* Avant / après */
+.ink-ba {
+  margin: 0;
+}
+.ink-ba-stage {
+  position: relative;
+  overflow: hidden;
+  border: 1px solid rgba(247, 236, 226, 0.16);
+  border-radius: 6px;
+}
+.ink-ba-stage img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.ink-ba-before {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  object-fit: cover;
+  clip-path: inset(0 calc(100% - var(--pos)) 0 0);
+}
+.ink-ba-bar {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: var(--pos);
+  width: 2px;
+  background: var(--gold);
+  box-shadow: 0 0 12px rgba(233, 196, 106, 0.8);
+  transform: translateX(-1px);
+  pointer-events: none;
+}
+.ink-ba-stage input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: ew-resize;
+}
+.ink-ba-tag {
+  position: absolute;
+  top: 10px;
+  padding: 3px 9px;
+  border-radius: 999px;
+  background: rgba(7, 3, 10, 0.75);
+  font-size: 0.62rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--cream);
+  pointer-events: none;
+}
+.ink-ba-tag-l { left: 10px; }
+.ink-ba-tag-r { right: 10px; }
+.ink-ba figcaption {
+  margin-top: 8px;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--cream);
+}
+
+@media (max-width: 900px) {
+  .ink-flash {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .ink-real-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 820px) {
+  .ink-section {
+    padding: 14px 0 50px;
+  }
+  .ink-head,
+  .ink-center,
+  .ink-flash,
+  .ink-real {
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+}
+@media (max-width: 520px) {
+  .ink-real-grid {
+    grid-template-columns: 1fr;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ink-card svg * {
+    stroke-dashoffset: 0;
+    animation: none !important;
+  }
+}
+
+
+/* =====================================================================
+   « Mon univers » — Hobby n°6 : Crochet
+   ===================================================================== */
+.cr-section {
+  position: relative;
+  padding: 30px 0 70px;
+}
+.cr-head {
+  max-width: 1180px;
+  padding-left: 0;
+  padding-right: 0;
+}
+.cr-head h2 {
+  font-size: clamp(2rem, 4.4vw, 3.2rem);
+  text-transform: uppercase;
+  color: var(--cream);
+  margin: 0 0 12px;
+}
+.cr-tags {
+  margin: 0;
+  font-size: 0.8rem;
+  letter-spacing: 0.3em;
+  text-transform: uppercase;
+  color: var(--gold-soft);
+}
+
+/* La scène (un grand bouton) */
+.cr-scene {
+  display: grid;
+  justify-items: center;
+  gap: 6px;
+  width: 100%;
+  margin: 0;
+  padding: clamp(18px, 3vw, 32px) 18px 22px;
+  border: 1px solid rgba(233, 196, 106, 0.28);
+  border-radius: 22px;
+  background:
+    radial-gradient(70% 80% at 25% 20%, rgba(242, 165, 142, 0.16), transparent 70%),
+    linear-gradient(165deg, rgba(60, 22, 50, 0.7), rgba(14, 6, 16, 0.92));
+  box-shadow: 0 22px 50px rgba(0, 0, 0, 0.5);
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
+}
+.cr-scene:hover,
+.cr-scene.is-open {
+  border-color: rgba(233, 196, 106, 0.6);
+  box-shadow: 0 26px 56px rgba(0, 0, 0, 0.55), 0 0 40px rgba(233, 196, 106, 0.12);
+}
+.cr-scene svg {
+  display: block;
+  width: 100%;
+  max-width: 600px;
+  height: auto;
+  overflow: visible;
+}
+
+/* 1) Au repos : la pelote respire, le fil ondule très doucement */
+.cr-ball {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: cr-roll 6s ease-in-out infinite;
+}
+.cr-thread {
+  transform-box: view-box;
+  transform-origin: 196px 182px;
+  animation: cr-sway 5s ease-in-out infinite;
+}
+.cr-hook {
+  transform-box: view-box;
+  transform-origin: 462px 70px;
+  transition: transform 0.6s ease;
+}
+@keyframes cr-roll {
+  0%, 100% { transform: rotate(-3deg); }
+  50% { transform: rotate(3deg); }
+}
+@keyframes cr-sway {
+  0%, 100% { transform: rotate(-1.5deg); }
+  50% { transform: rotate(1.5deg); }
+}
+
+/* 2) Au survol : le fil bouge, le crochet s'incline, les mailles apparaissent */
+.cr-scene.is-active .cr-ball {
+  animation-duration: 1.8s;
+}
+.cr-scene.is-active .cr-thread {
+  animation: cr-pull 1.2s ease-in-out infinite;
+}
+.cr-scene.is-active .cr-hook {
+  transform: rotate(-4deg);
+}
+@keyframes cr-pull {
+  0%, 100% { transform: rotate(-3deg) scaleX(1); }
+  50% { transform: rotate(3deg) scaleX(1.04); }
+}
+
+.cr-stitches ellipse {
+  opacity: 0;
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  transform: scale(0.2) rotate(-20deg);
+  transition: opacity 0.35s ease, transform 0.45s ease;
+  transition-delay: 0s;
+}
+.cr-scene.is-active .cr-stitches ellipse {
+  opacity: 1;
+  transform: scale(1) rotate(0);
+  transition-delay: calc(var(--i) * 0.12s);
+}
+.cr-swatch {
+  opacity: 0;
+  transform: translateY(8px);
+  transition: opacity 0.6s ease 1s, transform 0.6s ease 1s;
+}
+.cr-scene.is-active .cr-swatch {
+  opacity: 1;
+  transform: none;
+}
+
+/* Texte sous la scène */
+.cr-hint {
+  position: relative;
+  display: grid;
+  justify-items: center;
+  min-height: 1.6em;
+  font-family: 'Anton', sans-serif;
+  text-transform: uppercase;
+  font-size: clamp(1.1rem, 2.4vw, 1.5rem);
+  letter-spacing: 0.04em;
+  color: var(--cream);
+  text-align: center;
+}
+.cr-hint > span {
+  grid-area: 1 / 1;
+  transition: opacity 0.35s ease;
+}
+.cr-hint-active {
+  opacity: 0;
+  background: linear-gradient(90deg, var(--gold-soft), var(--rose));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.cr-scene.is-active .cr-hint-active {
+  opacity: 1;
+}
+.cr-scene.is-active .cr-hint-rest {
+  opacity: 0;
+}
+/* À gauche : les ouvrages qui défilent avec les flèches */
+.cr-layout {
+  display: grid;
+  grid-template-columns: 1.05fr 0.95fr;
+  align-items: center;
+  gap: clamp(20px, 4vw, 56px);
+  padding-top: 30px;
+  padding-left: 0;
+  padding-right: 0;
+}
+.cr-flow {
+  min-width: 0;
+  overflow: hidden;
+  padding: 18px 0 4px;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 6%, #000 94%, transparent);
+}
+.cr-flow-nav {
+  position: relative;
+  z-index: 20;
+}
+.cr-flow-track {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.cr-flow-item {
+  position: absolute;
+  margin: 0;
+  max-height: 100%;
+  overflow: hidden;
+  border: 1px solid rgba(233, 196, 106, 0.25);
+  border-radius: 14px;
+  background: linear-gradient(165deg, rgba(60, 22, 50, 0.85), rgba(14, 6, 16, 0.95));
+  box-shadow: 0 20px 44px rgba(0, 0, 0, 0.5);
+  cursor: pointer;
+}
+.cr-flow-item.is-active {
+  border-color: rgba(233, 196, 106, 0.6);
+  cursor: default;
+}
+.cr-flow-item img {
+  display: block;
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
+}
+.cr-flow-item figcaption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 26px 14px 12px;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--cream);
+  background: linear-gradient(to top, rgba(7, 3, 10, 0.9), transparent);
+}
+.cr-flow-empty {
+  display: grid;
+  place-items: end center;
+  aspect-ratio: 3 / 4;
+  padding-bottom: 16px;
+  background-image:
+    repeating-linear-gradient(45deg, rgba(242, 165, 142, 0.14) 0 3px, transparent 3px 9px),
+    linear-gradient(165deg, rgba(122, 47, 60, 0.9), rgba(30, 10, 20, 0.95));
+}
+.cr-flow-empty small {
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(247, 236, 226, 0.78);
+}
+.cr-flow-nav {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 18px;
+  margin-top: 22px;
+}
+.cr-flow-count {
+  min-width: 56px;
+  text-align: center;
+  font-size: 0.78rem;
+  letter-spacing: 0.18em;
+  color: var(--muted);
+}
+.cr-flow .book-nav {
+  background: rgba(15, 6, 7, 0.88);
+  border-color: rgba(233, 196, 106, 0.45);
+  color: var(--gold-soft);
+}
+
+.cr-quote {
+  max-width: 62ch;
+  margin: 30px auto 0;
+  text-align: center;
+  color: var(--muted);
+  line-height: 1.8;
+}
+
+@media (max-width: 820px) {
+  .cr-section {
+    padding: 14px 0 50px;
+  }
+  .cr-head,
+  .cr-layout,
+  .cr-section > .wrap:last-child {
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+  .cr-layout {
+    grid-template-columns: 1fr;
+    gap: 28px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cr-ball,
+  .cr-thread,
+  .cr-scene.is-active .cr-thread {
+    animation: none;
+  }
+}
+
+/* =====================================================================
+   « Mon univers » — Hobby n°2 : carnet de croquis
+   ===================================================================== */
+.sketch-section {
+  position: relative;
+  padding: 30px 0 70px;
+}
+.sketch-head {
+  padding-left: 0;
+  padding-right: 0;
+  max-width: 1180px;
+}
+.sketch-head h2 {
+  font-size: clamp(2rem, 4.4vw, 3.2rem);
+  text-transform: uppercase;
+  color: var(--cream);
+  margin: 0 0 14px;
+}
+.sketch-head p:not(.eyebrow) {
+  max-width: 640px;
+  margin: 14px 0 0;
+  color: var(--muted);
+  line-height: 1.7;
+}
+.sketch-tag {
+  display: inline-block;
+  padding: 6px 14px;
+  border: 1px solid rgba(233, 196, 106, 0.4);
+  border-radius: 999px;
+  font-size: 0.72rem;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: var(--gold-soft);
+  background: rgba(233, 196, 106, 0.06);
+}
+
+/* Les feuilles défilent toutes seules, de gauche à droite (l'inverse des mangas).
+   Chaque dessin garde son format : on le voit en entier. */
+.sketch-marquee {
+  --sheet-h: clamp(260px, 30vw, 400px);
+  overflow: hidden;
+  padding: 44px 0 40px;
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 7%, #000 93%, transparent);
+}
+.sketch-track {
+  display: flex;
+  align-items: center;
+  width: max-content;
+  animation: sketch-scroll var(--dur, 36s) linear infinite;
+  will-change: transform;
+}
+/* Sens : gauche → droite. Pour revenir à droite → gauche, inverse « from » et « to » dans @keyframes sketch-scroll. */
+
+@keyframes sketch-scroll {
+  from {
+    transform: translateX(-50%);
+  }
+  to {
+    transform: translateX(0);
+  }
+}
+.sketch-sheet {
+  position: relative;
+  flex: none;
+  height: var(--sheet-h);
+  margin: 0 22px 0 0;
+  padding: 0;
+  background: #0b0508;
+  border: 1px solid rgba(233, 196, 106, 0.3);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.55);
+  transition: box-shadow 0.35s ease;
+}
+.sketch-sheet img {
+  display: block;
+  height: 100%;
+  width: auto;
+  max-width: none;
+}
+.sketch-sheet figcaption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 26px 14px 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--cream);
+  background: linear-gradient(to top, rgba(7, 3, 10, 0.85), transparent);
+}
+/* Feuilles légèrement penchées, chacune à sa façon */
+.sketch-sheet-1 { transform: rotate(-3deg) translateY(8px); }
+.sketch-sheet-2 { transform: rotate(2deg) translateY(-8px); }
+.sketch-sheet-3 { transform: rotate(-1.5deg) translateY(6px); }
+.sketch-sheet-4 { transform: rotate(3deg) translateY(-4px); }
+
+/* Feuille vide : papier ligné en attendant tes dessins */
+.sketch-empty {
+  position: relative;
+  display: grid;
+  place-items: end center;
+  width: calc(var(--sheet-h) * 0.7);
+  height: 100%;
+  background-color: #120a10;
+  background-image: repeating-linear-gradient(
+    transparent 0 23px,
+    rgba(247, 236, 226, 0.07) 23px 24px
+  );
+}
+.sketch-empty small {
+  padding-bottom: 14px;
+  font-size: 0.68rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: rgba(247, 236, 226, 0.55);
+}
+
+.sketch-caption {
+  text-align: center;
+  margin: 8px 0 0;
+  font-size: 0.8rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--gold-soft);
+  opacity: 0.85;
+}
+
+@media (max-width: 820px) {
+  .sketch-section {
+    padding: 14px 0 50px;
+  }
+  .sketch-head {
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+  .sketch-marquee {
+    --sheet-h: 230px;
+  }
+  .sketch-sheet {
+    margin-right: 14px;
+    border-radius: 10px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .sketch-marquee {
+    overflow-x: auto;
+  }
+  .sketch-track {
+    animation: none;
+  }
+}
+
+/* ---- Bouton « Voir tous mes dessins » ---- */
+.sketch-more {
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  margin: 34px auto 0;
+  padding: 0 22px;
+  text-align: center;
+}
+.sketch-more p {
+  max-width: 460px;
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.6;
+}
+.sketch-more-btn {
+  display: inline-block;
+  padding: 16px 30px;
+  border-radius: 999px;
+  background: var(--rose);
+  color: var(--bg-2);
+  font-size: 1rem;
+  font-weight: 600;
+  box-shadow: 0 14px 32px rgba(0, 0, 0, 0.45);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.sketch-more-btn:hover {
+  background: var(--rose-deep);
+  transform: scale(1.05);
+}
+
+/* =====================================================================
+   Galerie « Mes dessins » (page /univers/dessins)
+   ===================================================================== */
+.drawing-gallery-wrap {
+  padding-bottom: 70px;
+}
+.drawing-grid {
+  column-count: 3;
+  column-gap: 22px;
+}
+.drawing-item {
+  position: relative;
+  display: block;
+  width: 100%;
+  margin: 0 0 22px;
+  padding: 0;
+  break-inside: avoid;
+  overflow: hidden;
+  background: #0b0508;
+  border: 1px solid rgba(233, 196, 106, 0.3);
+  border-radius: 12px;
+  box-shadow: 0 16px 34px rgba(0, 0, 0, 0.5);
+  cursor: zoom-in;
+  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+.drawing-item img {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+.drawing-caption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  padding: 26px 14px 12px;
+  text-align: left;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--cream);
+  background: linear-gradient(to top, rgba(7, 3, 10, 0.85), transparent);
+}
+.drawing-item-empty {
+  cursor: default;
+}
+.drawing-item-empty .sketch-empty {
+  width: 100%;
+  height: 260px;
+}
+@media (hover: hover) {
+  .drawing-item:hover {
+    border-color: rgba(233, 196, 106, 0.6);
+    transform: translateY(-6px);
+    box-shadow: 0 24px 46px rgba(0, 0, 0, 0.6), 0 0 28px rgba(233, 196, 106, 0.18);
+  }
+}
+.drawing-back {
+  margin-top: 26px;
+  text-align: center;
+}
+
+/* Agrandissement d'un dessin */
+.drawing-lightbox {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 14px;
+  padding: 24px;
+  background: rgba(5, 2, 8, 0.92);
+  cursor: zoom-out;
+}
+.drawing-lightbox img {
+  max-width: min(94vw, 1100px);
+  max-height: 84vh;
+  width: auto;
+  height: auto;
+  border: 2px solid rgba(233, 196, 106, 0.5);
+  border-radius: 4px;
+  box-shadow: 0 30px 70px rgba(0, 0, 0, 0.7);
+  cursor: default;
+}
+.drawing-lightbox p {
+  margin: 0;
+  color: var(--cream);
+  font-weight: 600;
+}
+.drawing-close {
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  width: 44px;
+  height: 44px;
+  border: 1px solid rgba(233, 196, 106, 0.4);
+  border-radius: 50%;
+  background: rgba(20, 8, 14, 0.8);
+  color: var(--cream);
+  font-size: 1.1rem;
+  cursor: pointer;
+}
+
+@media (max-width: 820px) {
+  .drawing-gallery-wrap {
+    padding-left: 22px;
+    padding-right: 22px;
+  }
+  .drawing-grid {
+    column-count: 2;
+    column-gap: 14px;
+  }
+  .drawing-item {
+    margin-bottom: 14px;
+  }
+}
+
+/* =====================================================================
+   Hobby n°5 : Henné — à coller À LA SUITE du bloc « Ink » dans index.css
+   (le reste du style ink-* est réutilisé tel quel)
+   ===================================================================== */
+.ink-panel.henne {
+  background:
+    radial-gradient(60% 80% at 50% 0%, rgba(214, 120, 62, 0.16), transparent 70%),
+    radial-gradient(40% 50% at 90% 100%, rgba(233, 196, 106, 0.06), transparent 70%),
+    #07030a;
+}
+/* Traits couleur henné (orange cuivré) au lieu de blanc */
+.henne .ink-card svg {
+  stroke: #e3925a;
+  stroke-width: 1.7;
+  filter: drop-shadow(0 0 6px rgba(214, 120, 62, 0.25));
+}
+.henne .ink-card {
+  border-color: rgba(227, 146, 90, 0.22);
+  background: rgba(214, 120, 62, 0.04);
+}
+@media (hover: hover) {
+  .henne .ink-card:hover {
+    border-color: rgba(227, 146, 90, 0.7);
+  }
+}
+.henne .ink-card figcaption small {
+  color: #e3925a;
+}
+
+
+/* =====================================================================
+   1) PAGE PARCOURS — carte « Mon CV »
+   ===================================================================== */
+.cv-card {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  align-items: center;
+  gap: clamp(24px, 5vw, 56px);
+  padding: clamp(24px, 4vw, 40px);
+  border: 1px solid rgba(242, 165, 142, 0.3);
+  border-radius: 16px;
+  background:
+    radial-gradient(90% 120% at 0% 0%, rgba(242, 165, 142, 0.12), transparent 60%),
+    var(--bg-2);
+  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.35);
+}
+.cv-sheet {
+  position: relative;
+  width: clamp(120px, 16vw, 168px);
+  aspect-ratio: 3 / 4;
+  padding: 16px 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  border-radius: 6px;
+  background: var(--cream);
+  transform: rotate(-4deg);
+  box-shadow: 0 18px 34px rgba(0, 0, 0, 0.5);
+  transition: transform 0.4s ease;
+}
+.cv-card:hover .cv-sheet {
+  transform: rotate(0deg) translateY(-4px);
+}
+.cv-sheet-photo {
+  width: 30%;
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--rose), var(--rose-deep));
+}
+.cv-sheet-name {
+  height: 8px;
+  width: 70%;
+  border-radius: 4px;
+  background: var(--bg);
+}
+.cv-sheet-role {
+  height: 5px;
+  width: 45%;
+  border-radius: 4px;
+  background: var(--rose-deep);
+}
+.cv-sheet-line {
+  height: 4px;
+  width: 100%;
+  border-radius: 4px;
+  background: rgba(28, 10, 13, 0.18);
+}
+.cv-sheet-line.short {
+  width: 65%;
+}
+.cv-text h2 {
+  font-family: 'Anton', sans-serif;
+  text-transform: uppercase;
+  font-size: clamp(1.8rem, 3.6vw, 2.6rem);
+  margin: 6px 0 10px;
+}
+.about-block .cv-text p:not(.eyebrow) {
+  max-width: 44ch;
+}
+.cv-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-top: 22px;
+}
+.cv-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 13px 24px;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--cream);
+  transition: transform 0.2s ease, border-color 0.2s ease, color 0.2s ease, background 0.2s ease;
+}
+.cv-btn:hover {
+  border-color: var(--rose);
+  color: var(--rose);
+}
+.cv-btn-main {
+  border: 0;
+  background: linear-gradient(135deg, var(--rose), var(--rose-deep));
+  color: var(--bg-2);
+  box-shadow: 0 14px 30px rgba(217, 122, 108, 0.32);
+}
+.cv-btn-main:hover {
+  color: var(--bg-2);
+  transform: translateY(-2px);
+}
+.cv-meta {
+  display: block;
+  margin-top: 12px;
+  font-size: 0.74rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+@media (max-width: 640px) {
+  .cv-card {
+    grid-template-columns: 1fr;
+    justify-items: center;
+    text-align: center;
+  }
+  .cv-actions {
+    justify-content: center;
+  }
+}
+
+/* =====================================================================
+   2) MON UNIVERS — fusée de progression, retour en haut, traînée d'étoiles
+   ===================================================================== */
+.space-progress {
+  position: fixed;
+  right: 14px;
+  top: 22vh;
+  bottom: 22vh;
+  width: 18px;
+  z-index: 25;
+  pointer-events: none;
+}
+.space-progress-track,
+.space-progress-fill {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  margin-left: -1px;
+  border-radius: 2px;
+}
+.space-progress-track {
+  background: rgba(247, 236, 226, 0.12);
+}
+.space-progress-fill {
+  background: linear-gradient(180deg, transparent, var(--gold));
+  transform-origin: top;
+  transform: scaleY(0);
+}
+.space-progress-rocket {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 18px;
+  height: 30px;
+  margin: -15px 0 0 -9px;
+  filter: drop-shadow(0 0 6px rgba(233, 196, 106, 0.6));
+}
+/* La fusée pointe vers le bas : la flamme est au-dessus */
+.space-progress-rocket svg {
+  display: block;
+  transform: rotate(180deg);
+}
+.space-progress-rocket .body {
+  fill: var(--cream);
+}
+.space-progress-rocket .fin {
+  fill: var(--rose-deep);
+}
+.space-progress-rocket .win {
+  fill: var(--bg);
+  stroke: var(--gold);
+  stroke-width: 1;
+}
+.space-progress-rocket .flame {
+  fill: var(--gold);
+  transform-origin: 12px 28px;
+  animation: rocket-flame 0.35s ease-in-out infinite alternate;
+}
+@keyframes rocket-flame {
+  from { transform: scaleY(0.7); opacity: 0.7; }
+  to { transform: scaleY(1.15); opacity: 1; }
+}
+
+.space-top {
+  position: fixed;
+  right: 18px;
+  bottom: 22px;
+  z-index: 26;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  border: 1px solid rgba(233, 196, 106, 0.55);
+  border-radius: 50%;
+  background: rgba(15, 6, 7, 0.82);
+  backdrop-filter: blur(6px);
+  color: var(--gold-soft);
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(14px);
+  pointer-events: none;
+  transition: opacity 0.3s ease, transform 0.3s ease, background 0.2s ease, color 0.2s ease;
+}
+.space-top.is-on {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+}
+.space-top:hover {
+  background: var(--gold);
+  color: var(--bg-2);
+}
+
+.star-trail {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  z-index: 40;
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .space-progress {
+    right: 6px;
+  }
+  .space-top {
+    right: 14px;
+    bottom: 16px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .space-progress-rocket .flame {
+    animation: none;
+  }
+}
+
+/* =====================================================================
+   « Mon univers » — conclusion : la constellation des hobbies
+   ===================================================================== */
+.outro-section {
+  position: relative;
+  padding: clamp(50px, 8vw, 100px) 0 clamp(60px, 9vw, 110px);
+}
+.outro {
+  text-align: center;
+}
+.outro h2 {
+  max-width: 18ch;
+  margin: 10px auto 0;
+  font-size: clamp(2rem, 5vw, 3.6rem);
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: var(--cream);
+}
+.outro h2 .gold {
+  background: linear-gradient(90deg, var(--gold-soft), var(--rose));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Le ciel : une zone où les étoiles sont placées en % */
+.outro-sky {
+  position: relative;
+  width: 100%;
+  max-width: 880px;
+  height: clamp(220px, 30vw, 300px);
+  margin: clamp(34px, 5vw, 56px) auto 0;
+}
+.outro-lines {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+}
+.outro-lines polyline {
+  fill: none;
+  stroke: rgba(233, 196, 106, 0.5);
+  stroke-width: 1.2;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.outro-lines {
+  clip-path: inset(0 100% 0 0);
+}
+.outro-sky.is-on .outro-lines {
+  animation: outro-draw 2.6s ease forwards 0.3s;
+}
+@keyframes outro-draw {
+  to { clip-path: inset(-10px -10px -10px -10px); }
+}
+.outro-lines-m {
+  display: none;
+}
+
+.outro-star {
+  position: absolute;
+  left: var(--x);
+  top: var(--y);
+  transform: translate(-50%, -50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: none;
+  border: 0;
+  color: var(--cream);
+  cursor: pointer;
+}
+.outro-dot {
+  position: relative;
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  background: var(--gold-soft);
+  box-shadow: 0 0 0 5px rgba(233, 196, 106, 0.14), 0 0 22px rgba(233, 196, 106, 0.8);
+  opacity: 0;
+  transform: scale(0.2);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+.outro-sky.is-on .outro-dot {
+  animation: outro-pop 0.6s ease forwards;
+  animation-delay: calc(var(--i) * 0.5s + 0.2s);
+}
+@keyframes outro-pop {
+  to { opacity: 1; transform: scale(1); }
+}
+.outro-name {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-size: 0.74rem;
+  font-weight: 600;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  opacity: 0.85;
+  transition: color 0.25s ease, opacity 0.25s ease;
+}
+.outro-star:hover .outro-dot,
+.outro-star:focus-visible .outro-dot {
+  transform: scale(1.5);
+  box-shadow: 0 0 0 8px rgba(233, 196, 106, 0.2), 0 0 34px rgba(233, 196, 106, 1);
+}
+.outro-star:hover .outro-name,
+.outro-star:focus-visible .outro-name {
+  color: var(--gold-soft);
+  opacity: 1;
+}
+
+.outro-text {
+  max-width: 52ch;
+  margin: clamp(26px, 4vw, 40px) auto 0;
+  color: var(--muted);
+  font-size: clamp(1rem, 0.4vw + 0.92rem, 1.15rem);
+  line-height: 1.75;
+}
+.outro-actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 28px;
+}
+.outro-btn {
+  display: inline-flex;
+  align-items: center;
+  padding: 14px 28px;
+  border: 1px solid rgba(233, 196, 106, 0.5);
+  border-radius: 999px;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--gold-soft);
+  transition: transform 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+.outro-btn:hover {
+  background: rgba(233, 196, 106, 0.12);
+  transform: translateY(-2px);
+}
+.outro-btn-main {
+  border: 0;
+  background: linear-gradient(135deg, var(--gold-soft), var(--rose));
+  color: var(--bg-2);
+  box-shadow: 0 14px 30px rgba(233, 196, 106, 0.22);
+}
+.outro-btn-main:hover {
+  background: linear-gradient(135deg, var(--gold-soft), var(--rose));
+  color: var(--bg-2);
+}
+.outro-back {
+  display: inline-block;
+  margin-top: 36px;
+}
+
+@media (max-width: 640px) {
+  .outro-sky {
+    height: 380px;
+    max-width: 340px;
+  }
+  .outro-lines-d {
+    display: none;
+  }
+  .outro-lines-m {
+    display: block;
+  }
+  .outro-star {
+    left: var(--mx);
+    top: var(--my);
+  }
+  .outro-name {
+    top: 50%;
+    left: 100%;
+    margin-left: 6px;
+    transform: translateY(-50%);
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .outro-lines {
+    clip-path: none;
+    animation: none !important;
+  }
+  .outro-dot {
+    opacity: 1;
+    transform: none;
+    animation: none !important;
+  }
+}
+
+/* Étoiles hautes : le nom passe au-dessus pour ne pas croiser le trait (grand écran) */
+@media (min-width: 641px) {
+  .outro-star.is-top .outro-name {
+    top: auto;
+    bottom: 100%;
+  }
+}
+
+/* Petite phrase « et bien d'autres choses… » */
+.outro-more {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  max-width: 46ch;
+  margin: 26px auto 0;
+  padding-top: 22px;
+  border-top: 1px solid rgba(233, 196, 106, 0.22);
+  font-family: 'Caveat', cursive;
+  font-size: clamp(1.4rem, 2.6vw, 1.85rem);
+  line-height: 1.3;
+  color: var(--gold-soft);
+}
+.outro-more-spark {
+  font-family: 'Inter', sans-serif;
+  font-size: 0.9rem;
+  color: var(--gold);
+  animation: outro-twinkle 2.6s ease-in-out infinite;
+}
+.outro-more-sub {
+  font-size: 0.9em;
+  color: var(--rose);
+}
+@keyframes outro-twinkle {
+  0%, 100% { opacity: 0.4; transform: scale(0.85); }
+  50% { opacity: 1; transform: scale(1.2); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .outro-more-spark { animation: none; }
+}
+
+
+/* =====================================================================
+   « Mon univers » — Hobby n°6 : Voyage (cartes postales)
+   ===================================================================== */
+.travel-section {
+  position: relative;
+  padding: clamp(40px, 6vw, 80px) 0;
+}
+.tv-head h2 {
+  font-size: clamp(2.4rem, 6vw, 4.4rem);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--cream);
+  margin: 0 0 14px;
+}
+.tv-head p:not(.eyebrow) {
+  max-width: 54ch;
+  color: var(--muted);
+  font-size: clamp(1rem, 0.4vw + 0.92rem, 1.15rem);
+  line-height: 1.7;
+}
+
+.tv-groups {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(36px, 5vw, 60px);
+  margin-top: clamp(26px, 4vw, 44px);
+}
+.tv-group-head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 18px;
+  margin-bottom: 20px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(233, 196, 106, 0.22);
+}
+.tv-group-head h3 {
+  font-family: 'Anton', sans-serif;
+  text-transform: uppercase;
+  font-size: clamp(1.3rem, 2.4vw, 1.8rem);
+  letter-spacing: 0.04em;
+  color: var(--gold-soft);
+}
+.tv-group-head p {
+  color: var(--muted);
+  font-size: 0.95rem;
+}
+
+.tv-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 220px), 1fr));
+  gap: clamp(18px, 2.4vw, 28px);
+}
+.tv-card {
+  margin: 0;
+  transform: rotate(var(--r, 0deg));
+  transition: transform 0.35s ease;
+}
+@media (hover: hover) {
+  .tv-card:hover {
+    transform: rotate(0deg) translateY(-6px);
+  }
+}
+.tv-inner {
+  position: relative;
+  display: block;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  perspective: 900px;
+}
+.tv-flip {
+  cursor: pointer;
+}
+.tv-face {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border: 1px solid rgba(233, 196, 106, 0.35);
+  border-radius: 10px;
+  background:
+    radial-gradient(90% 70% at 20% 0%, rgba(233, 196, 106, 0.14), transparent 65%),
+    linear-gradient(160deg, #1d0d12, #0b0508);
+  box-shadow: 0 18px 38px rgba(0, 0, 0, 0.5);
+  backface-visibility: hidden;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.tv-front img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+/* dégradé pour lire le nom sur la photo */
+.tv-front.has-img::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(8, 3, 5, 0.85), transparent 55%);
+}
+.tv-city {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 16px;
+  z-index: 2;
+  font-family: 'Anton', sans-serif;
+  text-transform: uppercase;
+  font-size: clamp(1.2rem, 1.9vw, 1.65rem);
+  line-height: 1.05;
+  overflow-wrap: anywhere;
+  letter-spacing: 0.02em;
+  color: var(--cream);
+}
+/* Tampon postal */
+.tv-stamp {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 46px;
+  height: 46px;
+  border: 2px dashed rgba(233, 196, 106, 0.8);
+  border-radius: 50%;
+  color: var(--gold-soft);
+  background: rgba(8, 3, 5, 0.35);
+  transform: rotate(10deg);
+}
+.tv-stamp b {
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+}
+/* Verso */
+.tv-back {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 12px;
+  padding: 22px;
+  transform: rotateY(180deg);
+}
+.tv-back-city {
+  font-family: 'Anton', sans-serif;
+  text-transform: uppercase;
+  font-size: 1.3rem;
+  color: var(--gold-soft);
+}
+.tv-back p {
+  color: var(--cream);
+  font-size: 0.98rem;
+  line-height: 1.6;
+}
+.tv-flip.is-flipped .tv-front {
+  transform: rotateY(-180deg);
+}
+.tv-flip.is-flipped .tv-back {
+  transform: rotateY(0deg);
+}
+.tv-flip:focus-visible .tv-face {
+  outline: 2px solid var(--gold);
+  outline-offset: 3px;
+}
+
+@media (max-width: 640px) {
+  .tv-card {
+    transform: none;
+  }
+  .tv-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 14px;
+  }
+  .tv-city {
+    left: 12px;
+    right: 12px;
+    bottom: 12px;
+    font-size: 1.05rem;
+  }
+  .tv-stamp {
+    width: 38px;
+    height: 38px;
+    top: 10px;
+    right: 10px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .tv-face,
+  .tv-card {
+    transition: none;
+  }
+}
+
+
+/* ---- Plusieurs photos par carte ---- */
+.tv-front img {
+  opacity: 0;
+  transition: opacity 0.6s ease;
+}
+.tv-front img.is-active {
+  opacity: 1;
+}
+.tv-hit {
+  position: absolute;
+  inset: 0;
+  display: block;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  perspective: 900px;
+}
+.tv-hit .tv-front {
+  position: absolute;
+  inset: 0;
+}
+/* Quand la carte est retournée via le bouton « i » */
+.tv-inner.is-flipped > .tv-hit .tv-front {
+  transform: rotateY(-180deg);
+}
+.tv-inner.is-flipped > .tv-back {
+  transform: rotateY(0deg);
+}
+.tv-inner:has(> .tv-hit) > .tv-back {
+  z-index: 1;
+  pointer-events: none;
+}
+.tv-inner.is-flipped > .tv-hit {
+  pointer-events: none;
+}
+.tv-dots {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 10px;
+  z-index: 3;
+  display: flex;
+  gap: 6px;
+}
+.tv-dots i {
+  width: 14px;
+  height: 3px;
+  border-radius: 2px;
+  background: rgba(247, 236, 226, 0.35);
+  transition: background 0.3s ease, width 0.3s ease;
+}
+.tv-dots i.on {
+  width: 24px;
+  background: var(--gold);
+}
+.tv-note-btn {
+  position: absolute;
+  left: 12px;
+  top: 12px;
+  z-index: 4;
+  width: 30px;
+  height: 30px;
+  border: 1px solid rgba(233, 196, 106, 0.6);
+  border-radius: 50%;
+  background: rgba(8, 3, 5, 0.6);
+  color: var(--gold-soft);
+  font-family: Georgia, serif;
+  font-style: italic;
+  font-weight: 700;
+  font-size: 1rem;
+  line-height: 1;
+  cursor: pointer;
+}
+.tv-note-btn:hover {
+  background: var(--gold);
+  color: var(--bg-2);
+}
+.tv-front:has(.tv-dots) .tv-city {
+  bottom: 26px;
+}
+
+/* Henné : cartes photo mélangées aux motifs (même carré que les motifs) */
+.henne .ink-card-photo img {
+  aspect-ratio: 1;
+  height: auto;
+  object-fit: cover;
+  background: #05020a;
+}
+.henne .ink-card-photo figcaption small {
+  color: #e3925a;
+}

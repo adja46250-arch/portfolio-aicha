@@ -2,9 +2,10 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Reveal from '../components/Reveal'
 import StarSky from '../components/StarSky'
-import { DRAWINGS } from '../data/drawings'
+import { useWorkingDrawings } from '../lib/useWorkingDrawings'
 
 export default function DrawingGallery() {
+  const { list: DRAWINGS, onError } = useWorkingDrawings()
   const [open, setOpen] = useState(null) // index du dessin agrandi
 
   // Même ambiance sombre que « Mon univers »
@@ -54,7 +55,12 @@ export default function DrawingGallery() {
                 onClick={() => setOpen(real.indexOf(d))}
                 aria-label={`Agrandir ${d.title || 'le dessin'}`}
               >
-                <img src={d.image} alt={d.title || 'Dessin'} loading="lazy" />
+                <img
+                  src={d.image}
+                  alt={d.title || 'Dessin'}
+                  loading="lazy"
+                  onError={() => onError(d.image)}
+                />
                 {d.title && <span className="drawing-caption">{d.title}</span>}
               </button>
             ) : (
