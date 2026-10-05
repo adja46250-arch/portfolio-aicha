@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient'
 import Reveal from '../components/Reveal'
 import { SocialIcons } from '../components/SocialIcons'
@@ -11,6 +12,13 @@ const WHATSAPP_MESSAGE = "Bonjour Aïcha, j'ai vu ton portfolio et j'aimerais di
 
 const EMAIL = 'adja46250@gmail.com'
 
+// Clé publique Web3Forms : chaque message arrive dans ta boîte mail.
+const WEB3FORMS_KEY = import.meta.env.VITE_WEB3FORMS_KEY || ''
+
+// Message pré-rempli quand on arrive depuis « Demander mon CV »
+const CV_MESSAGE =
+  "Bonjour Aïcha,\n\nJe souhaiterais recevoir votre CV. Merci d'avance.\n\nCordialement,"
+
 // Un bouton ne s'affiche que si son lien n'est pas vide : laisse '' pour le masquer.
 const SOCIAL_LINKS = [
   { key: 'linkedin', label: 'LinkedIn', href: 'www.linkedin.com/in/adja-aïcha-diarra-b68701386' },
@@ -20,7 +28,12 @@ const SOCIAL_LINKS = [
 ]
 
 export default function Contact() {
-  const [form, setForm] = useState({ name: '', email: '', message: '' })
+const [params] = useSearchParams()
+const [form, setForm] = useState({
+  name: '',
+  email: '',
+  message: params.get('objet') === 'cv' ? CV_MESSAGE : '',
+})
   const [status, setStatus] = useState(null) // null | 'sending' | 'success' | 'error'
 
   function update(field, value) {
@@ -28,28 +41,56 @@ export default function Contact() {
   }
 
   async function handleSubmit(e) {
-    e.preventDefault()
+  e.preventDefault()
 
-    if (!isSupabaseConfigured) {
-      setStatus('error')
-      return
-    }
+  if (!isSupabaseConfigured && !WEB3FORMS_KEY) {
+    setStatus('error')
+    return
+  }
 
-    setStatus('sending')
-    const { error } = await supabase.from('messages').insert({
-      name: form.name,
-      email: form.email,
-      message: form.message,
-    })
+  setStatus('sending')
 
-    if (error) {
-      console.error(error.message)
-      setStatus('error')
-    } else {
-      setStatus('success')
-      setForm({ name: '', email: '', message: '' })
+  // 1) Archive dans Supabase (visible dans l'admin)
+  const saved = isSupabaseConfigured
+    ? await supabase
+        .from('messages')
+        .insert({ name: form.name, email: form.email, message: form.message })
+        .then(({ error }) => {
+          if (error) console.error(error.message)
+          return !error
+        })
+    : false
+
+  // 2) Notification par e-mail dans ta boîte (Web3Forms)
+  let mailed = false
+  if (WEB3FORMS_KEY) {
+    try {
+      const res = await fetch('https://api.web3forms.com/submit', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({
+          access_key: WEB3FORMS_KEY,
+          subject: `Portfolio : message de ${form.name}`,
+          from_name: 'Portfolio Aïcha',
+          name: form.name,
+          email: form.email,
+          message: form.message,
+        }),
+      })
+      const data = await res.json()
+      mailed = Boolean(data.success)
+    } catch (err) {
+      console.error(err)
     }
   }
+
+  if (saved || mailed) {
+    setStatus('success')
+    setForm({ name: '', email: '', message: '' })
+  } else {
+    setStatus('error')
+  }
+}
 
   const links = SOCIAL_LINKS.filter((s) => s.href)
   const waDigits = WHATSAPP_NUMBER.replace(/\D/g, '')
