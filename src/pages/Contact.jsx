@@ -21,7 +21,7 @@ const CV_MESSAGE =
 
 // Un bouton ne s'affiche que si son lien n'est pas vide : laisse '' pour le masquer.
 const SOCIAL_LINKS = [
-  { key: 'linkedin', label: 'LinkedIn', href: 'www.linkedin.com/in/adja-aïcha-diarra-b68701386' },
+  { key: 'linkedin', label: 'LinkedIn', href: 'https://www.linkedin.com/in/adja-aïcha-diarra-b68701386' },
   { key: 'github', label: 'GitHub', href: 'https://github.com/adja46250-arch' },
   { key: 'tiktok', label: 'TikTok', href: '' },
   { key: 'facebook', label: 'Facebook', href: '' },
