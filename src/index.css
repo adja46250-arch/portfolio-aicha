@@ -6266,7 +6266,7 @@ body.is-universe footer.site {
 @media (max-width: 640px) {
   .tv-card {
     transform: none;
-    font-size: 0.78rem;
+    font-size: 0.38rem;
   }
   .tv-grid {
     grid-template-columns: repeat(2, 1fr);
