@@ -9,6 +9,23 @@ const STORY = [
   { key: 'result', label: 'Le résultat' },
 ]
 
+// « Titre | texte » par ligne
+const pairs = (t) =>
+  (t || '')
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .map((l) => {
+      const i = l.indexOf('|')
+      return i === -1 ? { title: l, text: '' } : { title: l.slice(0, i).trim(), text: l.slice(i + 1).trim() }
+    })
+const lines = (t) =>
+  (t || '')
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean)
+const paras = (t) => (t || '').split(/\n{2,}/).map((x) => x.trim()).filter(Boolean)
+
 export default function ProjectDetail() {
   const { id } = useParams()
   const { projects, loading } = useProjects()
@@ -37,6 +54,11 @@ export default function ProjectDetail() {
       : project.image
         ? [project.image]
         : []
+  const features = pairs(project.features)
+  const techs = pairs(project.tech_choices)
+  const archi = pairs(project.architecture)
+  const roadmap = lines(project.roadmap)
+  const hasCase = project.why || project.utility || features.length || techs.length || archi.length || project.security || roadmap.length
   const story = STORY.filter((s) => project[s.key] && project[s.key].trim())
 
   return (
@@ -121,6 +143,92 @@ export default function ProjectDetail() {
               <p>{project[s.key]}</p>
             </Reveal>
           ))}
+        </section>
+      )}
+
+      {hasCase && (
+        <section className="wrap case">
+          {[
+            ['why', 'Pourquoi ce projet ?'],
+            ['utility', 'À quoi ça sert, concrètement ?'],
+          ].map(
+            ([k, label]) =>
+              project[k] && (
+                <Reveal as="div" key={k} className="case-block">
+                  <h2>{label}</h2>
+                  {paras(project[k]).map((t, i) => (
+                    <p key={i}>{t}</p>
+                  ))}
+                </Reveal>
+              ),
+          )}
+
+          {features.length > 0 && (
+            <Reveal as="div" className="case-block">
+              <h2>Fonctionnalités clés et comment elles marchent</h2>
+              <div className="case-grid">
+                {features.map((f) => (
+                  <article className="case-card" key={f.title}>
+                    <h3>{f.title}</h3>
+                    <p>{f.text}</p>
+                  </article>
+                ))}
+              </div>
+            </Reveal>
+          )}
+
+          {archi.length > 0 && (
+            <Reveal as="div" className="case-block">
+              <h2>Comment c'est construit</h2>
+              <div className="case-flow">
+                {archi.map((a, i) => (
+                  <div className="case-flow-item" key={a.title + i}>
+                    <div className="case-node">
+                      <strong>{a.title}</strong>
+                      {a.text && <span>{a.text}</span>}
+                    </div>
+                    {i < archi.length - 1 && <span className="case-arrow" aria-hidden="true">→</span>}
+                  </div>
+                ))}
+              </div>
+              {paras(project.architecture_note).map((t, i) => (
+                <p key={i}>{t}</p>
+              ))}
+            </Reveal>
+          )}
+
+          {techs.length > 0 && (
+            <Reveal as="div" className="case-block">
+              <h2>Choix techniques</h2>
+              <ul className="case-list">
+                {techs.map((t) => (
+                  <li key={t.title}>
+                    <strong>{t.title}</strong> {t.text && <>: {t.text}</>}
+                  </li>
+                ))}
+              </ul>
+            </Reveal>
+          )}
+
+          {project.security && (
+            <Reveal as="div" className="case-block">
+              <h2>Sécurité</h2>
+              {paras(project.security).map((t, i) => (
+                <p key={i}>{t}</p>
+              ))}
+            </Reveal>
+          )}
+
+          {roadmap.length > 0 && (
+            <Reveal as="div" className="case-block">
+              <h2>Prochaines étapes</h2>
+              <ul className="case-list">
+                {roadmap.map((r) => (
+                  <li key={r}>{r}</li>
+                ))}
+              </ul>
+            </Reveal>
+          )}
         </section>
       )}
 

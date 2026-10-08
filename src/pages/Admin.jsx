@@ -13,6 +13,14 @@ const EMPTY_FORM = {
   problem: '',
   solution: '',
   result: '',
+  why: '',
+  utility: '',
+  features: '',
+  tech_choices: '',
+  architecture: '',
+  architecture_note: '',
+  security: '',
+  roadmap: '',
   image: '',
   images: [],
 }
@@ -20,6 +28,117 @@ const EMPTY_FORM = {
 // Nom du bucket Supabase Storage à créer une fois dans le dashboard
 // (Storage > New bucket > "project-images", coché "Public bucket").
 const IMAGE_BUCKET = 'project-images'
+
+// Fiche projet détaillée (étude de cas), affichée dans la page /projets/:id.
+// Dans l'ordre d'apparition sur la page. kind : 'text' = paragraphes, 'pairs' = titre + explication, 'single' = une phrase par ligne.
+const CASE_FIELDS = [
+  { k: 'why', kind: 'text', label: 'Pourquoi ce projet ?', ph: "Le contexte : un cas concret d'entreprise, puis d'association…" },
+  { k: 'utility', kind: 'text', label: 'À quoi ça sert, concrètement ?', ph: "Ce que ça change pour la personne qui l'utilise." },
+  { k: 'features', kind: 'pairs', label: 'Fonctionnalités clés et comment elles marchent', titleLabel: 'Fonctionnalité (ex. Tableau kanban)', textLabel: 'Explication (ex. Les tâches sont des cartes…)', add: '+ Ajouter une fonctionnalité' },
+  { k: 'tech_choices', kind: 'pairs', label: 'Choix techniques', titleLabel: 'Technologie (ex. Supabase)', textLabel: 'Pourquoi ce choix', add: '+ Ajouter un choix' },
+  { k: 'architecture', kind: 'pairs', label: "Schéma d'architecture", hint: "Chaque bloc devient une case du schéma, reliée à la suivante par une flèche. Mets-les dans l'ordre.", titleLabel: 'Bloc (ex. Navigateur)', textLabel: 'Détail court (ex. Pages HTML et JavaScript)', add: '+ Ajouter un bloc', flow: true },
+  { k: 'architecture_note', kind: 'text', label: "Explication de l'architecture", ph: 'Explique le schéma en mots simples (ex. ce qu\'est Supabase, « sans serveur »).' },
+  { k: 'security', kind: 'text', label: 'Sécurité', ph: 'Un court paragraphe.' },
+  { k: 'roadmap', kind: 'single', label: 'Prochaines étapes', titleLabel: 'Étape', add: '+ Ajouter une étape' },
+]
+
+const parseRows = (value, kind) =>
+  (value || '')
+    .split('\n')
+    .map((l) => l.trim())
+    .filter(Boolean)
+    .map((l) => {
+      if (kind === 'single') return { title: l, text: '' }
+      const i = l.indexOf('|')
+      return i === -1 ? { title: l, text: '' } : { title: l.slice(0, i).trim(), text: l.slice(i + 1).trim() }
+    })
+
+const oneLine = (t) => (t || '').replace(/\s*\n\s*/g, ' ').trim()
+const serializeRows = (rows, kind) =>
+  rows
+    .filter((r) => r.title.trim() || r.text.trim())
+    .map((r) => {
+      const title = oneLine(r.title).replace(/\|/g, '/')
+      return kind === 'single' || !oneLine(r.text) ? title : `${title} | ${oneLine(r.text)}`
+    })
+    .join('\n')
+
+// Liste éditable : une ligne = un élément (titre + explication). Le format enregistré reste « Titre | texte ».
+function ListEditor({ def, value, onChange }) {
+  const kind = def.kind
+  const [rows, setRows] = useState(() => parseRows(value, kind))
+  const [bulk, setBulk] = useState('')
+
+  // Si la valeur change de l'extérieur (autre projet chargé, formulaire vidé), on recharge les lignes
+  useEffect(() => {
+    if (value !== serializeRows(rows, kind)) setRows(parseRows(value, kind))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value])
+
+  const commit = (next) => {
+    setRows(next)
+    onChange(serializeRows(next, kind))
+  }
+  const patch = (i, key, v) => commit(rows.map((r, j) => (j === i ? { ...r, [key]: v } : r)))
+  const move = (i, d) => {
+    const j = i + d
+    if (j < 0 || j >= rows.length) return
+    const next = [...rows]
+    ;[next[i], next[j]] = [next[j], next[i]]
+    commit(next)
+  }
+  const named = rows.filter((r) => r.title.trim())
+
+  return (
+    <div className="le">
+      {def.hint && <p className="le-hint">{def.hint}</p>}
+      {rows.map((r, i) => (
+        <div className="le-row" key={i}>
+          <span className="le-num">{i + 1}</span>
+          <div className="le-inputs">
+            <input value={r.title} placeholder={def.titleLabel} onChange={(e) => patch(i, 'title', e.target.value)} />
+            {kind === 'pairs' && (
+              <textarea value={r.text} placeholder={def.textLabel} rows={2} onChange={(e) => patch(i, 'text', e.target.value)} />
+            )}
+          </div>
+          <div className="le-tools">
+            <button type="button" onClick={() => move(i, -1)} disabled={i === 0} aria-label="Monter">↑</button>
+            <button type="button" onClick={() => move(i, 1)} disabled={i === rows.length - 1} aria-label="Descendre">↓</button>
+            <button type="button" onClick={() => commit(rows.filter((_, j) => j !== i))} aria-label="Supprimer">×</button>
+          </div>
+        </div>
+      ))}
+      <button type="button" className="btn btn-line le-add" onClick={() => commit([...rows, { title: '', text: '' }])}>
+        {def.add}
+      </button>
+
+      {def.flow && named.length > 0 && (
+        <p className="le-flow">
+          Aperçu : {named.map((r) => r.title.trim()).join('  →  ')}
+        </p>
+      )}
+
+      <details className="le-bulk">
+        <summary>Coller plusieurs lignes d'un coup</summary>
+        <p className="le-hint">
+          {kind === 'pairs' ? 'Une ligne par élément, au format : Titre | explication.' : 'Une ligne par élément.'}
+        </p>
+        <textarea value={bulk} rows={5} onChange={(e) => setBulk(e.target.value)} />
+        <button
+          type="button"
+          className="btn btn-line"
+          onClick={() => {
+            if (!bulk.trim()) return
+            commit(parseRows(bulk, kind))
+            setBulk('')
+          }}
+        >
+          Remplir la liste (remplace les lignes actuelles)
+        </button>
+      </details>
+    </div>
+  )
+}
 
 export default function Admin() {
   const [session, setSession] = useState(null)
@@ -178,6 +297,14 @@ export default function Admin() {
       problem: p.problem || '',
       solution: p.solution || '',
       result: p.result || '',
+      why: p.why || '',
+      utility: p.utility || '',
+      features: p.features || '',
+      tech_choices: p.tech_choices || '',
+      architecture: p.architecture || '',
+      architecture_note: p.architecture_note || '',
+      security: p.security || '',
+      roadmap: p.roadmap || '',
       image: p.image || '',
       images: p.images && p.images.length > 0 ? p.images : p.image ? [p.image] : [],
     })
@@ -364,6 +491,14 @@ export default function Admin() {
       problem: isDev ? form.problem : '',
       solution: isDev ? form.solution : '',
       result: isDev ? form.result : '',
+      why: isDev ? form.why : '',
+      utility: isDev ? form.utility : '',
+      features: isDev ? form.features : '',
+      tech_choices: isDev ? form.tech_choices : '',
+      architecture: isDev ? form.architecture : '',
+      architecture_note: isDev ? form.architecture_note : '',
+      security: isDev ? form.security : '',
+      roadmap: isDev ? form.roadmap : '',
       image: isDev ? form.images[0] || '' : form.image,
       images: isDev ? form.images : [],
     }
@@ -634,6 +769,34 @@ export default function Admin() {
                       onChange={(e) => setForm((f) => ({ ...f, result: e.target.value }))}
                     />
                   </div>
+
+                  <div className="field full case-fields-title">
+                    <h3>Fiche détaillée du projet</h3>
+                    <p>Tout est optionnel : seules les parties remplies apparaissent sur la page du projet. Les champs sont dans l'ordre d'affichage.</p>
+                  </div>
+
+                  {CASE_FIELDS.map((def) => (
+                    <div className="field full" key={def.k}>
+                      <label>{def.label}</label>
+                      {def.kind === 'text' ? (
+                        <>
+                          <textarea
+                            value={form[def.k]}
+                            placeholder={def.ph}
+                            rows={def.k === 'security' ? 4 : 6}
+                            onChange={(e) => setForm((f) => ({ ...f, [def.k]: e.target.value }))}
+                          />
+                          <small className="le-hint">Pour séparer deux paragraphes, laisse une ligne vide.</small>
+                        </>
+                      ) : (
+                        <ListEditor
+                          def={def}
+                          value={form[def.k]}
+                          onChange={(v) => setForm((f) => ({ ...f, [def.k]: v }))}
+                        />
+                      )}
+                    </div>
+                  ))}
 
                   <div className="field full">
                     <label>Captures d'écran du site</label>

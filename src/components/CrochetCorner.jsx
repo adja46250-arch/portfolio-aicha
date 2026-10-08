@@ -85,7 +85,34 @@ function OuvrageFlow({ items }) {
 export default function CrochetCorner() {
   const [hover, setHover] = useState(false)
   const [tap, setTap] = useState(false)
-  const active = hover || tap
+  const [auto, setAuto] = useState(false)
+  const [inView, setInView] = useState(false)
+  const scene = useRef(null)
+  const active = hover || tap || auto
+
+  // L'animation se joue seule : 5 s de crochet, 2 s de pause, en boucle (tant que la scène est visible)
+  useEffect(() => {
+    const el = scene.current
+    if (!el || !('IntersectionObserver' in window)) return
+    const io = new IntersectionObserver(([e]) => setInView(e.isIntersecting), { threshold: 0.3 })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
+
+  useEffect(() => {
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    if (!inView || reduce) {
+      setAuto(false)
+      return
+    }
+    let timer
+    const run = (on) => {
+      setAuto(on)
+      timer = setTimeout(() => run(!on), on ? 5000 : 2000)
+    }
+    run(true)
+    return () => clearTimeout(timer)
+  }, [inView])
 
   return (
     <Reveal as="section" className="cr-section">
@@ -100,6 +127,7 @@ export default function CrochetCorner() {
 
         <button
           type="button"
+          ref={scene}
           className={`cr-scene${active ? ' is-active' : ''}`}
           onMouseEnter={() => setHover(true)}
           onMouseLeave={() => setHover(false)}
@@ -170,7 +198,7 @@ export default function CrochetCorner() {
           </svg>
 
           <span className="cr-hint">
-            <span className="cr-hint-rest">Touche la pelote</span>
+            <span className="cr-hint-rest">Un fil, un crochet…</span>
             <span className="cr-hint-active">Créer, maille après maille.</span>
           </span>
         </button>

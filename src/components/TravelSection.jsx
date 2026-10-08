@@ -3,14 +3,18 @@ import Reveal from './Reveal'
 import { TRAVEL } from '../data/travel'
 
 // Une carte postale : photo(s) + tampon du pays.
-//  - Plusieurs photos : elles défilent au survol (ordinateur) ou à chaque clic/toucher (téléphone).
-//  - Une phrase "note" : un petit bouton ⓘ retourne la carte pour la lire
-//    (s'il n'y a qu'une photo, un clic sur la carte suffit).
+//  - Plusieurs photos : elles défilent toutes seules (3 s chacune) tant que la carte est visible.
+//  - Une note : un clic retourne la carte pour la lire ; elle se retourne seule après 5 s
+//    et les photos reprennent. Un petit repère ✎ en bas à droite signale qu'il y a une note.
+const PHOTO_MS = 3000
+const NOTE_MS = 5000
+
 function Postcard({ place, code, index }) {
   const [flipped, setFlipped] = useState(false)
   const [broken, setBroken] = useState(() => new Set())
   const [idx, setIdx] = useState(0)
-  const timer = useRef(null)
+  const [visible, setVisible] = useState(false)
+  const card = useRef(null)
 
   const all = place.images?.length ? place.images : place.image ? [place.image] : []
   const imgs = all.filter((src) => !broken.has(src))
@@ -18,23 +22,32 @@ function Postcard({ place, code, index }) {
   const hasNote = Boolean(place.note)
   const current = idx % Math.max(imgs.length, 1)
 
-  const stop = () => {
-    if (timer.current) clearInterval(timer.current)
-    timer.current = null
-  }
-  useEffect(() => stop, [])
+  // La carte ne joue que lorsqu'elle est à l'écran
+  useEffect(() => {
+    const el = card.current
+    if (!el || !('IntersectionObserver' in window)) {
+      setVisible(true)
+      return
+    }
+    const io = new IntersectionObserver(([e]) => setVisible(e.isIntersecting), { threshold: 0.35 })
+    io.observe(el)
+    return () => io.disconnect()
+  }, [])
 
-  const onEnter = (e) => {
-    if (!multi || e.pointerType !== 'mouse' || timer.current) return
-    setIdx((i) => i + 1)
-    timer.current = setInterval(() => setIdx((i) => i + 1), 1300)
-  }
-  const onLeave = (e) => {
-    if (e.pointerType !== 'mouse') return
-    stop()
-    setIdx(0)
-  }
-  const next = () => setIdx((i) => i + 1)
+  // Défilement automatique des photos (pause pendant la lecture de la note)
+  useEffect(() => {
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    if (!multi || !visible || flipped || reduce) return
+    const t = setInterval(() => setIdx((i) => i + 1), PHOTO_MS)
+    return () => clearInterval(t)
+  }, [multi, visible, flipped])
+
+  // La note se referme toute seule
+  useEffect(() => {
+    if (!flipped) return
+    const t = setTimeout(() => setFlipped(false), NOTE_MS)
+    return () => clearTimeout(t)
+  }, [flipped])
 
   const front = (
     <div className={`tv-face tv-front${imgs.length ? ' has-img' : ''}`}>
@@ -51,6 +64,11 @@ function Postcard({ place, code, index }) {
       <span className="tv-stamp" aria-hidden="true">
         <b>{code}</b>
       </span>
+      {hasNote && (
+        <span className="tv-note-tag" aria-hidden="true" title="Touche pour lire le souvenir">
+          <i>✎</i>
+        </span>
+      )}
       <span className="tv-city">{place.city}</span>
       {multi && (
         <span className="tv-dots" aria-hidden="true">
@@ -63,56 +81,25 @@ function Postcard({ place, code, index }) {
   )
 
   const style = { '--r': index % 2 ? '1.6deg' : '-1.6deg' }
-  const pointer = { onPointerEnter: onEnter, onPointerLeave: onLeave }
 
-  // Ni note ni plusieurs photos : carte simple
-  if (!hasNote && !multi) {
+  // Pas de note : carte simple (les photos défilent seules s'il y en a plusieurs)
+  if (!hasNote) {
     return (
-      <figure className="tv-card" style={style}>
+      <figure className="tv-card" style={style} ref={card}>
         <div className="tv-inner">{front}</div>
       </figure>
     )
   }
 
-  // Plusieurs photos : le clic fait défiler ; le bouton ⓘ retourne la carte (s'il y a une note)
-  if (multi) {
-    return (
-      <figure className="tv-card" style={style} {...pointer}>
-        <div className={`tv-inner${flipped ? ' is-flipped' : ''}`}>
-          <button type="button" className="tv-hit" onClick={next} aria-label={`${place.city} : photo suivante`}>
-            {front}
-          </button>
-          {hasNote && (
-            <>
-              <div className="tv-face tv-back">
-                <span className="tv-back-city">{place.city}</span>
-                <p>{place.note}</p>
-              </div>
-              <button
-                type="button"
-                className="tv-note-btn"
-                onClick={() => setFlipped((f) => !f)}
-                aria-pressed={flipped}
-                aria-label={flipped ? 'Revenir aux photos' : 'Lire le souvenir'}
-              >
-                {flipped ? '×' : 'i'}
-              </button>
-            </>
-          )}
-        </div>
-      </figure>
-    )
-  }
-
-  // Une photo + une note : toute la carte se retourne
+  // Une note : un clic retourne la carte
   return (
-    <figure className="tv-card" style={style}>
+    <figure className="tv-card" style={style} ref={card}>
       <button
         type="button"
         className={`tv-inner tv-flip${flipped ? ' is-flipped' : ''}`}
         onClick={() => setFlipped((f) => !f)}
         aria-pressed={flipped}
-        aria-label={`${place.city} : retourner la carte`}
+        aria-label={`${place.city} : lire le souvenir`}
       >
         {front}
         <div className="tv-face tv-back">

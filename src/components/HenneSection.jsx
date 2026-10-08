@@ -79,9 +79,15 @@ const MOTIFS = [
   },
 ]
 
+// Les motifs se dessinent, restent affichés un moment, s'effacent doucement puis se redessinent.
+const DRAW_MS = 3500 // le temps que tous les traits se dessinent
+const HOLD_MS = 2000 // la pause, motifs entièrement dessinés (1 à 3 s)
+const FADE_MS = 700 // l'effacement avant de recommencer
+
 export default function HenneSection() {
   const ref = useRef(null)
-  const [inView, setInView] = useState(false)
+  const [visible, setVisible] = useState(false)
+  const [phase, setPhase] = useState('idle') // idle | draw | fade | reset
 
   // CARDS (data/henne.js) : mélange de motifs dessinés et de tes photos, dans l'ordre choisi.
   // Une carte photo sans image est ignorée (rien ne s'affiche tant que tu n'as pas la photo).
@@ -96,25 +102,41 @@ export default function HenneSection() {
     return c.image ? { image: c.image, title: c.title } : null
   }).filter(Boolean)
 
-  // Les traits se dessinent quand la section arrive à l'écran
+  // La section ne joue que lorsqu'elle est à l'écran
   useEffect(() => {
     const el = ref.current
     if (!el || !('IntersectionObserver' in window)) {
-      setInView(true)
+      setVisible(true)
       return
     }
-    const io = new IntersectionObserver(
-      ([e]) => {
-        if (e.isIntersecting) {
-          setInView(true)
-          io.disconnect()
-        }
-      },
-      { threshold: 0.25 }
-    )
+    const io = new IntersectionObserver(([e]) => setVisible(e.isIntersecting), { threshold: 0.25 })
     io.observe(el)
     return () => io.disconnect()
   }, [])
+
+  // Boucle : dessin → pause → effacement → nouveau dessin
+  useEffect(() => {
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    if (reduce) {
+      setPhase('draw')
+      return
+    }
+    if (!visible) {
+      setPhase('idle')
+      return
+    }
+    let timer
+    const go = (next) => {
+      setPhase(next)
+      if (next === 'draw') timer = setTimeout(() => go('fade'), DRAW_MS + HOLD_MS)
+      else if (next === 'fade') timer = setTimeout(() => go('reset'), FADE_MS)
+      else timer = setTimeout(() => go('draw'), 120)
+    }
+    go('draw')
+    return () => clearTimeout(timer)
+  }, [visible])
+
+  const inView = phase === 'draw' || phase === 'fade'
 
   return (
     <Reveal as="section" className="ink-section">
@@ -129,7 +151,7 @@ export default function HenneSection() {
           <p className="ink-tags">Motifs • fêtes • tradition</p>
         </div>
 
-        <div className={`wrap ink-flash${inView ? ' is-in' : ''}`}>
+        <div className={`wrap ink-flash${inView ? ' is-in' : ''}${phase === 'fade' ? ' is-fade' : ''}`}>
           {cards.map((c, i) =>
             c.motif ? (
               <figure key={`m-${c.motif.key}`} className="ink-card" style={{ '--d': `${i * 0.25}s` }}>
