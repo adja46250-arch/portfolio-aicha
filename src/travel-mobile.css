@@ -1,0 +1,26 @@
+/* Voyage : texte adapté à la carte, TÉLÉPHONE UNIQUEMENT (ne change rien sur ordinateur) */
+@media (max-width: 768px) {
+  .tv-card {
+    container-type: inline-size;
+  }
+  .tv-card .tv-back {
+    padding: clamp(10px, 7cqw, 20px) !important;
+    gap: clamp(4px, 3cqw, 8px) !important;
+  }
+  .tv-card .tv-back-city {
+    font-size: clamp(0.85rem, 6.5cqw, 1.15rem) !important;
+  }
+  .tv-card .tv-back p {
+    font-size: clamp(0.64rem, 4.4cqw, 0.88rem) !important;
+    line-height: 1.45 !important;
+    margin: 0;
+    max-height: 100%;
+    overflow-y: auto;
+  }
+  .tv-card .tv-city {
+    font-size: clamp(0.95rem, 8cqw, 1.5rem) !important;
+  }
+  .tv-card .tv-front:has(.tv-note-tag) .tv-city {
+    right: 46px;
+  }
+}

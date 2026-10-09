@@ -6728,31 +6728,3 @@ body.is-universe footer.site {
 .ink-flash.is-fade .ink-card svg {
   opacity: 0;
 }
-
-
-/* ---- Voyage : texte adapté à la carte, SUR TÉLÉPHONE UNIQUEMENT ---- */
-@media (max-width: 640px) {
-  .tv-card {
-    container-type: inline-size;
-  }
-  .tv-back {
-    padding: clamp(10px, 7cqw, 20px);
-    gap: clamp(4px, 3cqw, 8px);
-  }
-  .tv-back-city {
-    font-size: clamp(0.85rem, 6.5cqw, 1.15rem);
-  }
-  .tv-back p {
-    margin: 0;
-    max-height: 100%;
-    overflow-y: auto;
-    font-size: clamp(0.64rem, 4.4cqw, 0.88rem);
-    line-height: 1.45;
-  }
-  .tv-city {
-    font-size: clamp(0.95rem, 8cqw, 1.5rem);
-  }
-  .tv-front:has(.tv-note-tag) .tv-city {
-    right: 46px; /* le nom ne passe pas sous le repère ✎ */
-  }
-}
