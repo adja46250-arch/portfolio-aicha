@@ -1,10 +1,11 @@
-import { useState } from 'react'
+import { useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useProjects } from '../lib/useProjects'
 import Reveal from '../components/Reveal'
 import PosterFan from '../components/PosterFan'
 import ProjectShots from '../components/ProjectShots'
+import SkyClouds from '../components/SkyClouds'
 
 const FILTERS = [
   { key: 'all', label: 'Tous' },
@@ -15,6 +16,7 @@ const FILTERS = [
 export default function Projects() {
   const { projects } = useProjects()
   const [filter, setFilter] = useState('all')
+  const topRef = useRef(null)
 
   function handleSpotlight(e) {
     const rect = e.currentTarget.getBoundingClientRect()
@@ -28,7 +30,12 @@ export default function Projects() {
   const designItems = visible.filter((p) => p.category === 'design')
 
   return (
-    <main>
+    <main className="pj-page">
+      <div className="pj-hero">
+        <div className="design-motifs" aria-hidden="true">
+          <i className="dm-r" />
+          <i className="dm-l" />
+        </div>
       <section className="page-hero wrap">
         <p className="eyebrow">Développement &amp; infographie</p>
         <h1 className="anton">
@@ -52,17 +59,30 @@ export default function Projects() {
           ))}
         </div>
       </section>
+      </div>
 
-      <section className="projects-list wrap">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={filter}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.3 }}
-          >
+      <div className={`pj-top${devItems.length === 0 ? ' pj-top-empty' : ''}`} ref={topRef}>
+        <div className="dev-motifs" aria-hidden="true">
+          <i className="dm-r" />
+          <i className="dm-l" />
+        </div>
+        <SkyClouds targetRef={topRef} variant="dev-clouds" offset={['start end', 'start 15%']} />
+
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={filter}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+        >
+          <section className="projects-list wrap">
             {devItems.length > 0 && (
+              <>
+              <div className="pj-head">
+                <span className="dev-eyebrow">Projets</span>
+                <h2 className="pj-title">Développement</h2>
+              </div>
               <div className="project-mock-list">
                 {devItems.map((p, i) => {
                   const CardLink = p.link ? 'a' : 'div'
@@ -128,17 +148,40 @@ export default function Projects() {
                   )
                 })}
               </div>
+              </>
             )}
+          </section>
+        </motion.div>
+      </AnimatePresence>
+      <SkyClouds targetRef={topRef} variant="dev-clouds-b" offset={['end end', 'end 35%']} />
+      </div>
 
-            {designItems.length > 0 && (
-              <Reveal as="div" className="gallery-block">
-                <h2 className="gallery-heading">Infographie</h2>
+      <AnimatePresence mode="wait">
+        {designItems.length > 0 && (
+          <motion.div
+            key={`d-${filter}`}
+            className="pj-design design-band"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            <div className="design-motifs" aria-hidden="true">
+              <i className="dm-r" />
+              <i className="dm-l" />
+            </div>
+            <section className="wrap pj-design-inner">
+              <Reveal as="div">
+                <div className="pj-head pj-head-design">
+                  <span className="dev-eyebrow">Projets</span>
+                  <h2 className="pj-title">Infographie</h2>
+                </div>
                 <PosterFan items={designItems} linkTo="/projets/galerie" linkLabel="Ouvrir la galerie" />
               </Reveal>
-            )}
+            </section>
           </motion.div>
-        </AnimatePresence>
-      </section>
+        )}
+      </AnimatePresence>
     </main>
   )
 }

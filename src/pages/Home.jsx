@@ -238,7 +238,6 @@ export default function Home() {
   const apRef = useRef(null)
   const devRef = useRef(null)
   const statsRef = useRef(null)
-  const ctaRef = useRef(null)
   const heroRef = useRef(null)
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -548,8 +547,7 @@ export default function Home() {
         </Reveal>
       </section>
       </div>
-      <div className="cb-wrap" ref={ctaRef}>
-        <ApClouds targetRef={ctaRef} offset={['start end', 'start 30%']} />
+      <div className="cb-wrap">
         <ContactBand />
       </div>
     </main>
