@@ -4,9 +4,132 @@ import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion'
 import { useProjects } from '../lib/useProjects'
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient'
 import Reveal from '../components/Reveal'
+import { SocialIcons } from '../components/SocialIcons'
 import Marquee from '../components/Marquee'
 import ProjectShots from '../components/ProjectShots'
 import Testimonials from '../components/Testimonials'
+import ContactBand from '../components/ContactBand'
+
+// Quelques étoiles dorées qui scintillent doucement le long de la page (positions fixes, générées une fois)
+const SPARKLES = (() => {
+  let seed = 7
+  const rnd = () => ((seed = (seed * 9301 + 49297) % 233280) / 233280)
+  return Array.from({ length: 28 }, (_, i) => ({
+    left: 4 + rnd() * 92,
+    top: 3 + (i / 28) * 94 + rnd() * 3,
+    size: 0.8 + rnd() * 1.0,
+    delay: -rnd() * 6,
+    dur: 3.5 + rnd() * 4,
+    kind: i % 5 === 0 ? 'red' : 'gold',
+  }))
+})()
+
+function Sparkles() {
+  return (
+    <div className="sparkles" aria-hidden="true">
+      {SPARKLES.map((st, i) => (
+        <i
+          key={i}
+          className={`sparkle sparkle-${st.kind}`}
+          style={{ left: `${st.left}%`, top: `${st.top}%`, fontSize: `${st.size}rem`, animationDelay: `${st.delay}s`, animationDuration: `${st.dur}s` }}
+        >
+          ✦
+        </i>
+      ))}
+    </div>
+  )
+}
+
+// Nom géant en filigrane derrière la photo : s'écrit lettre par lettre, curseur qui clignote
+// ⚠️ Tes liens (section « À propos ») — un lien vide = le bouton n'apparaît pas
+const LINKEDIN_URL = 'https://www.linkedin.com/in/adja-a%C3%AFcha-diarra-b68701386/'
+const GITHUB_URL = 'https://github.com/adja46250-arch'
+const EMAIL = 'adja46250@gmail.com'
+
+// Nuages qui se forment quand on arrive sur « À propos » (liés au défilement)
+const CLOUDS = [
+  { cls: 'c1', x: -120 }, { cls: 'c2', x: 140 }, { cls: 'c3', x: -80 },
+  { cls: 'c4', x: 100 }, { cls: 'c5', x: 0 },
+]
+function ApClouds({ targetRef, variant = '', offset = ['start end', 'start 25%'] }) {
+  const { scrollYProgress } = useScroll({ target: targetRef, offset })
+  const opacity = useTransform(scrollYProgress, [0, 0.7, 1], [0, 1, 1])
+  const scale = useTransform(scrollYProgress, [0, 1], [0.55, 1.05])
+  const y = useTransform(scrollYProgress, [0, 1], [70, 0])
+  return (
+    <div className={`ap-clouds ${variant}`} aria-hidden="true">
+      {CLOUDS.map((c) => (
+        <motion.i key={c.cls} className={`ap-cloud ${c.cls}`} style={{ opacity, scale, y }} />
+      ))}
+    </div>
+  )
+}
+
+const WM_LINES = ['ADJA AÏCHA', 'DIARRA']
+
+function HeroWatermark() {
+  const total = WM_LINES.join('').length
+  const [n, setN] = useState(0)
+
+  useEffect(() => {
+    const reduce = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
+    if (reduce) {
+      setN(total)
+      return
+    }
+    let timer
+    let i = 0
+    let typing = true
+    // ---- Réglages de vitesse (en millisecondes) ----
+    const TYPE_MS = 240        // délai entre deux lettres (plus grand = plus lent)
+    const HOLD_MS = 7000       // le nom complet reste affiché
+    const ERASE_MS = 80        // vitesse d'effacement
+    const RESTART_MS = 1800    // pause avant de recommencer
+    const tick = () => {
+      if (typing) {
+        i += 1
+        setN(i)
+        if (i >= total) {
+          typing = false
+          timer = setTimeout(tick, HOLD_MS)
+          return
+        }
+        timer = setTimeout(tick, TYPE_MS)
+      } else {
+        i -= 1
+        setN(Math.max(i, 0))
+        if (i <= 0) {
+          typing = true
+          timer = setTimeout(tick, RESTART_MS)
+          return
+        }
+        timer = setTimeout(tick, ERASE_MS)
+      }
+    }
+    timer = setTimeout(tick, 1200)
+    return () => clearTimeout(timer)
+  }, [total])
+
+  let idx = 0
+  return (
+    <div className="hero-watermark" aria-hidden="true">
+      {n === 0 && <i className="wm-cursor" />}
+      {WM_LINES.map((line, li) => (
+        <div className="wm-line" key={li}>
+          {line.split('').map((ch, ci) => {
+            const my = idx++
+            return (
+              <span key={ci}>
+                <span className={`wm-ch${my < n ? ' on' : ''}`}>{ch === ' ' ? '\u00A0' : ch}</span>
+                {my === n - 1 && <i className="wm-cursor" />}
+              </span>
+            )
+          })}
+        </div>
+      ))}
+    </div>
+  )
+}
 
 function PosterCoverflow({ items }) {
   const [index, setIndex] = useState(0)
@@ -98,6 +221,24 @@ export default function Home() {
       })
   }, [])
 
+  const [aboutPhoto, setAboutPhoto] = useState('')
+
+  useEffect(() => {
+    if (!isSupabaseConfigured) return
+    supabase
+      .from('settings')
+      .select('home_about_image')
+      .eq('id', 1)
+      .single()
+      .then(({ data, error }) => {
+        if (!error && data?.home_about_image) setAboutPhoto(data.home_about_image)
+      })
+  }, [])
+
+  const apRef = useRef(null)
+  const devRef = useRef(null)
+  const statsRef = useRef(null)
+  const ctaRef = useRef(null)
   const heroRef = useRef(null)
   const { scrollYProgress } = useScroll({
     target: heroRef,
@@ -130,10 +271,18 @@ export default function Home() {
   }
 
   return (
-    <main>
+    <main className="home-main">
+      <Sparkles />
       <div className="hero-v2-wrap" ref={heroRef}>
         <section className="hero-v2 hero-v2-sticky">
           <motion.div className="hero-bg-glow" style={{ y: glowY, scale: glowScale }} />
+          <div className="hero-motifs" aria-hidden="true">
+            <i className="motif-l" />
+            <i className="motif-r" />
+          </div>
+          <motion.div className="hero-watermark-wrap" style={{ opacity: nameOpacity }}>
+            <HeroWatermark />
+          </motion.div>
 
           <motion.div
             className="hero-name"
@@ -190,80 +339,38 @@ export default function Home() {
 
       <Marquee items={['Développement web', 'Infographie', 'Identité de marque', 'Direction artistique']} />
 
-      <section className="about-teaser wrap">
-        <Reveal>
-          <div className="section-head">
-            <h2>À propos de moi</h2>
-          </div>
-        </Reveal>
-
-        <div className="about-teaser-grid">
-          <Reveal className="code-card spotlight" onMouseMove={handleSpotlight}>
-            <div className="code-card-bar">
-              <span className="dot dot-red" />
-              <span className="dot dot-yellow" />
-              <span className="dot dot-green" />
+      <section className="ap" ref={apRef}>
+        <ApClouds targetRef={apRef} />
+        <div className="ap-motifs" aria-hidden="true" />
+        <div className="ap-inner wrap">
+          <Reveal className="ap-photo">
+            <div className="ap-insta">
+              <div className="ap-insta-head">
+                <span className="ap-insta-avatar">A</span>
+                <span>Adja Aïcha</span>
+                <span className="ap-insta-dots">•••</span>
+              </div>
+              <div className="ap-insta-window">
+                {aboutPhoto && <img src={aboutPhoto} alt="Adja Aïcha Diarra" />}
+              </div>
+              <div className="ap-insta-foot">
+                <div className="ap-insta-icons">
+                  <svg className="heart" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7.5-4.6-9.5-9.3C1.2 8.5 3 5 6.4 5c2 0 3.7 1.1 5.6 3.3C13.9 6.1 15.6 5 17.6 5 21 5 22.8 8.5 21.5 11.7 19.5 16.4 12 21 12 21Z" /></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M20.5 12a8.5 8.5 0 1 1-3.6-6.950L21 4l-1 4.300A8.4 8.4 0 0 1 20.5 12Z" strokeLinejoin="round" /></svg>
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M21 3 10 14M21 3l-6.5 18-4-7-7-4L21 3Z" strokeLinejoin="round" /></svg>
+                  <svg className="save" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7"><path d="M6 3.500h12v17l-6-4.5-6 4.500v-17Z" strokeLinejoin="round" /></svg>
+                </div>
+                <p><strong>Adja Aïcha Diarra</strong> Créer. Apprendre. Innover. <span style={{ color: '#2f6fb5' }}>#portfolio</span></p>
+              </div>
             </div>
-
-            <pre className="code-card-body">
-              <code>
-                <span className="ln">01</span>{' '}
-                <span className="code-kw">const</span>{' '}
-                <span className="code-var">developer</span> = {'{'}
-                {'\n'}
-
-                <span className="ln">02</span>{'  '}
-                <span className="code-key">name</span>:{' '}
-                <span className="code-str">'Adja Aïcha Diarra'</span>,
-                {'\n'}
-
-                <span className="ln">03</span>{'  '}
-                <span className="code-key">role</span>:{' '}
-                <span className="code-str">'Développeuse Full-Stack'</span>,
-                {'\n'}
-
-                <span className="ln">04</span>{'  '}
-                <span className="code-key">focus</span>:{' '}
-                <span className="code-str">'Web, Design & Infographie'</span>,
-                {'\n'}
-
-                <span className="ln">05</span>{'  '}
-                <span className="code-key">stack</span>:{' '}
-                <span className="code-str">'Java, Javascrip, React, PHP, Flutter,  '</span>,
-                {'\n'}
-
-                <span className="ln">06</span>{'  '}
-                <span className="code-key">database</span>:{' '}
-                <span className="code-str">'MySQL, PostgreSQL, Supabase'</span>,
-                {'\n'}
-
-                <span className="ln">07</span>{'  '}
-                <span className="code-key">design</span>:{' '}
-                <span className="code-str">'Photoshop, Illustrator, Canva'</span>,
-                {'\n'}
-
-                <span className="ln">08</span>{'  '}
-                <span className="code-key">strengths</span>:{' '}
-                <span className="code-str">'Créativité, curiosité & rigueur'</span>,
-                {'\n'}
-
-                <span className="ln">09</span>{'  '}
-                <span className="code-key">vision</span>:{' '}
-                <span className="code-str">'Transformer les idées en solutions.'</span>,
-                {'\n'}
-
-                <span className="ln">10</span>{'  '}
-                <span className="code-key">location</span>:{' '}
-                <span className="code-str">"Côte d'Ivoire"</span>,
-                {'\n'}
-
-                <span className="ln">11</span>{'}'}
-                <span className="code-card-cursor">&nbsp;</span>
-              </code>
-            </pre>
           </Reveal>
 
-          <Reveal delay={0.1} className="about-teaser-text">
+          <Reveal delay={0.1} className="ap-text">
+            <span className="ap-eyebrow">À propos</span>
+            <h2 className="ap-title">
+              Je donne vie à vos idées, <em>en code et en images.</em>
+            </h2>
+
             <p>
               Je suis Adja Aïcha Diarra, développeuse web Full Stack et passionnée par la
               technologie, le design et la création digitale. Formée en sciences informatiques,
@@ -272,25 +379,77 @@ export default function Home() {
             </p>
             <p>
               Curieuse, créative et en constante évolution, je développe mes compétences en
-              développement web, conception d'interfaces et gestion de bases de données. Mon
-              objectif est de concevoir des projets qui allient technologie, créativité et
-              impact, tout en continuant à apprendre et à relever de nouveaux défis.
+              développement web, conception d'interfaces et gestion de bases de données.
             </p>
-            <p className="about-teaser-tagline">Créer. Apprendre. Innover. Donner vie aux idées.</p>
 
-            <Link to="/parcours" className="btn btn-line">
-              Mon parcours
-            </Link>
+            <div className="ap-facts">
+              <div className="ap-fact">
+                <span className="ap-fact-icon">{SocialIcons.pin}</span>
+                <div>
+                  <small>Basée en</small>
+                  <strong>Côte d'Ivoire</strong>
+                </div>
+              </div>
+              <div className="ap-fact">
+                <span className="ap-fact-icon">
+                  <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7">
+                    <path d="M2.5 9.5 12 5l9.5 4.5L12 14 2.5 9.5Z" strokeLinejoin="round" />
+                    <path d="M6.5 11.8V16c0 1.2 2.5 2.5 5.5 2.5s5.5-1.3 5.5-2.5v-4.2" strokeLinecap="round" strokeLinejoin="round" />
+                  </svg>
+                </span>
+                <div>
+                  <small>Formation</small>
+                  <strong>Licence en sciences informatiques</strong>
+                </div>
+              </div>
+            </div>
+
+            <div className="ap-links">
+              {LINKEDIN_URL && (
+                <a href={LINKEDIN_URL} target="_blank" rel="noopener noreferrer">
+                  {SocialIcons.linkedin}
+                  <span>LinkedIn</span>
+                </a>
+              )}
+              {GITHUB_URL && (
+                <a href={GITHUB_URL} target="_blank" rel="noopener noreferrer">
+                  {SocialIcons.github}
+                  <span>GitHub</span>
+                </a>
+              )}
+              {EMAIL && (
+                <a href={`mailto:${EMAIL}`}>
+                  {SocialIcons.email}
+                  <span>{EMAIL}</span>
+                </a>
+              )}
+            </div>
           </Reveal>
         </div>
       </section>
 
-      <section className="teaser wrap">
+      <div className="dev-band" ref={devRef}>
+        <div className="dev-motifs" aria-hidden="true">
+          <i className="dm-r" />
+          <i className="dm-l" />
+        </div>
+        <ApClouds targetRef={devRef} variant="dev-clouds" offset={['start end', 'start 15%']} />
+      <section className="teaser wrap dev-sec">
         <Reveal>
-          <div className="section-head">
-            <h2>Projets Développement</h2>
-            <Link to="/projets" className="eyebrow">
-              Voir tous les projets
+          <div className="dev-head">
+            <div>
+              <span className="dev-eyebrow">Projets développement</span>
+              <h2 className="dev-title">
+                Des idées qui deviennent <em>de vraies applications.</em>
+              </h2>
+              <p className="dev-lead">
+                Je conçois des applications web complètes, du premier croquis à la mise en ligne :
+                l’interface, la base de données et la logique, pensées pour être simples et utiles
+                au quotidien.
+              </p>
+            </div>
+            <Link to="/projets" className="dev-all">
+              Voir tous les projets <span aria-hidden="true">→</span>
             </Link>
           </div>
         </Reveal>
@@ -302,7 +461,8 @@ export default function Home() {
               : {}
             return (
               <Reveal
-                delay={i * 0.08}
+                delay={(i % 2) * 0.12}
+                y={90}
                 key={p.id}
                 as="article"
                 className="project-mock spotlight"
@@ -335,42 +495,51 @@ export default function Home() {
           })}
         </div>
       </section>
+        <ApClouds targetRef={devRef} variant="dev-clouds-b" offset={['end end', 'end 35%']} />
+      </div>
 
-      <section className="teaser wrap">
+      <div className="design-band">
+        <div className="design-motifs" aria-hidden="true">
+          <i className="dm-r" />
+          <i className="dm-l" />
+        </div>
+      <section className="teaser wrap design-sec">
         <Reveal>
-          <div className="section-head">
-            <h2>Projets Infographie</h2>
-            <Link to="/projets" className="eyebrow">
-              Voir toute la galerie
+          <div className="dev-head">
+            <div>
+              <span className="dev-eyebrow">Projets infographie</span>
+              <h2 className="dev-title">
+                Quand l’art rencontre <em>le design.</em>
+              </h2>
+              <p className="dev-lead">
+                Affiches, identités visuelles et illustrations : je donne une forme à vos idées,
+                avec des couleurs, des lettres et des images qui se remarquent.
+              </p>
+            </div>
+            <Link to="/projets" className="dev-all">
+              Voir toute la galerie <span aria-hidden="true">→</span>
             </Link>
           </div>
         </Reveal>
         <PosterCoverflow items={designFeatured} />
       </section>
+      </div>
 
-      <section className="stats wrap">
-        <Reveal>
-          <div className="stat">
-            <h3>05+</h3>
-            <p>projets construits de bout en bout, du code à l'interface</p>
-          </div>
-        </Reveal>
-        <Reveal delay={0.1}>
-          <div className="stat">
-            <h3>02</h3>
-            <p>domaines maîtrisés : développement et infographie</p>
-          </div>
-        </Reveal>
-        <Reveal delay={0.2}>
-          <div className="stat">
-            <h3>L3</h3>
-            <p>en Sciences informatiques</p>
-          </div>
-        </Reveal>
-      </section>
-
+      <div className="dev-band stats-band" ref={statsRef}>
+        <div className="dev-motifs" aria-hidden="true">
+          <i className="dm-r" />
+          <i className="dm-l" />
+        </div>
+        <ApClouds targetRef={statsRef} variant="dev-clouds" offset={['start end', 'start 15%']} />
       <Testimonials />
+        <ApClouds targetRef={statsRef} variant="dev-clouds-b" offset={['end end', 'end 35%']} />
+      </div>
 
+      <div className="design-band quote-band">
+        <div className="design-motifs" aria-hidden="true">
+          <i className="dm-r" />
+          <i className="dm-l" />
+        </div>
       <section className="pull-quote wrap">
         <Reveal>
           <p>
@@ -378,15 +547,11 @@ export default function Home() {
           </p>
         </Reveal>
       </section>
-
-      <section className="wrap" style={{ padding: '20px 0 80px' }}>
-        <Reveal className="cta-band">
-          <h2>Discutons de votre projet</h2>
-          <div className="cta-contact">
-            <Link to="/contact">Envoyer un message</Link>
-          </div>
-        </Reveal>
-      </section>
+      </div>
+      <div className="cb-wrap" ref={ctaRef}>
+        <ApClouds targetRef={ctaRef} offset={['start end', 'start 30%']} />
+        <ContactBand />
+      </div>
     </main>
   )
 }

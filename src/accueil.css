@@ -1,0 +1,561 @@
+/* =====================================================================
+   ACCUEIL : header noir, contour noir dégradé qui se fond dans le marron,
+   un peu de rouge derrière la photo, bande défilante noire.
+   (importé APRÈS index.css : rien à supprimer dans index.css)
+   ===================================================================== */
+
+/* Header tout noir, sur l'accueil uniquement */
+header.site.is-home,
+header.site.is-home.scrolled {
+  background: #050203;
+  backdrop-filter: none;
+  border-bottom-color: transparent;
+}
+
+/* Contour noir dégradé (haut, côtés, bas) qui se mélange au marron */
+.hero-v2-sticky::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(to bottom, #050203 0%, rgba(5, 2, 3, 0.65) 5%, rgba(5, 2, 3, 0) 20%),
+    linear-gradient(to right, #050203 0%, rgba(5, 2, 3, 0.55) 5%, rgba(5, 2, 3, 0) 18%),
+    linear-gradient(to left, #050203 0%, rgba(5, 2, 3, 0.55) 5%, rgba(5, 2, 3, 0) 18%),
+    linear-gradient(to top, #050203 0%, rgba(5, 2, 3, 0) 12%);
+}
+
+/* Fond marron d'origine + juste un peu de rouge derrière toi */
+.hero-bg-glow {
+  background:
+    radial-gradient(26% 36% at 50% 50%, rgba(163, 38, 56, 0.32), transparent 72%),
+    radial-gradient(60% 55% at 50% 38%, rgba(217, 122, 108, 0.55), transparent 70%),
+    radial-gradient(45% 40% at 50% 65%, rgba(224, 168, 87, 0.28), transparent 75%);
+}
+
+/* Bande défilante : fond noir, texte blanc, étoiles rouges */
+.marquee {
+  background: #050203;
+  border-top: 1px solid rgba(247, 236, 226, 0.12);
+  border-bottom: 1px solid rgba(247, 236, 226, 0.12);
+}
+.marquee-item { color: #ffffff; }
+.marquee-dot { color: #a32638; font-size: 1rem; } /* mets #7a1f2b pour le rouge vin plus sombre */
+
+
+/* ---------- Nom géant en filigrane rouge (s'écrit lettre par lettre) ---------- */
+.hero-watermark-wrap {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  overflow: hidden;
+}
+.hero-watermark {
+  font-family: 'Anton', sans-serif;
+  text-transform: uppercase;
+  text-align: center;
+  line-height: 0.92;
+  font-size: clamp(4.2rem, 22vw, 19rem);
+  letter-spacing: 0.01em;
+  color: rgba(108, 22, 34, 0.3);
+  text-shadow: 0 0 40px rgba(163, 38, 56, 0.25);
+  user-select: none;
+  transform: translateY(2%);
+}
+.wm-line { white-space: nowrap; }
+.wm-ch { opacity: 0; transition: opacity 0.18s ease; }
+.wm-ch.on { opacity: 1; }
+.wm-cursor {
+  display: inline-block;
+  position: relative;
+  width: 0;
+  height: 0.8em;
+  vertical-align: baseline;
+}
+.wm-cursor::after {
+  content: '';
+  position: absolute;
+  left: 0.02em;
+  bottom: -0.04em;
+  width: 0.05em;
+  height: 0.82em;
+  background: rgba(112, 4, 17, 0.75);
+  animation: wm-blink 0.9s steps(1) infinite;
+}
+@keyframes wm-blink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+@media (prefers-reduced-motion: reduce) {
+  .wm-cursor::after { animation: none; opacity: 0; }
+}
+@media (max-width: 820px) {
+  .hero-watermark-wrap { inset: 150px 0 auto 0; height: 440px; }
+  .hero-watermark { font-size: 21vw; }
+}
+
+
+/* ---------- Petites étoiles qui scintillent le long de la page d'accueil ---------- */
+.home-main { position: relative; }
+.sparkles { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.sparkle {
+  position: absolute;
+  font-style: normal;
+  line-height: 1;
+  opacity: 0;
+  animation: sparkle-twinkle 5s ease-in-out infinite;
+}
+.sparkle-gold { color: #d4a24c; }
+.sparkle-red { color: #c23048; }
+@keyframes sparkle-twinkle {
+  0%, 100% { opacity: 0; transform: scale(0.5) rotate(0deg); }
+  50% { opacity: 0.75; transform: scale(1.1) rotate(30deg); }
+}
+@media (max-width: 820px) {
+  .sparkle:nth-child(even) { display: none; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .sparkle { animation: none; opacity: 0.35; }
+}
+
+
+/* ---------- Motifs africains (image public/motifs-africains.jpg) : dégradé transparent, qui avancent vers la photo ---------- */
+.hero-motifs { position: absolute; inset: 0; z-index: 1; pointer-events: none; overflow: hidden; }
+.hero-motifs i {
+  --pw: min(26vw, 380px);              /* largeur de chaque bande */
+  --th: calc(var(--pw) * 2);           /* hauteur d'un motif (pour le défilement sans coupure) */
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: var(--pw);
+  background-image: url('/motifs-africains.jpg');
+  background-size: calc(var(--pw) * 2) auto;   /* on montre la moitié gauche du motif (symétrique) */
+  background-repeat: repeat-y;
+  background-position: 0 0;
+  mix-blend-mode: screen;               /* le noir du motif devient transparent */
+  opacity: 0.22;                        /* plus petit = plus transparent */
+  animation: motif-drift 70s linear infinite, motif-breathe 7s ease-in-out infinite alternate;
+  -webkit-mask-image: linear-gradient(to right, #000 0%, rgba(0, 0, 0, 0.6) 45%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 14%, #000 82%, transparent 100%);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to right, #000 0%, rgba(0, 0, 0, 0.6) 45%, transparent 100%),
+    linear-gradient(to bottom, transparent 0%, #000 14%, #000 82%, transparent 100%);
+  mask-composite: intersect;
+}
+.hero-motifs .motif-l { left: 0; }
+.hero-motifs .motif-r { right: 0; transform: scaleX(-1); }
+@keyframes motif-drift { to { background-position: 0 var(--th); } }
+@keyframes motif-breathe { from { opacity: 0.12; } to { opacity: 0.28; } }
+@media (max-width: 820px) {
+  .hero-motifs i { --pw: 28vw; opacity: 0.18; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero-motifs i { animation: none; opacity: 0.35; }
+}
+
+/* ---------- Header : bouton Contact (WhatsApp) ---------- */
+nav.site-nav { display: grid; grid-template-columns: 1fr auto 1fr; }
+nav.site-nav.wrap { max-width: none; padding-inline: clamp(16px, 3vw, 44px); }
+.nav-contact {
+  justify-self: end;
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 10px 20px; border-radius: 999px;
+  font-size: 0.74rem; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase;
+  color: #1c0a0d;
+  background: linear-gradient(135deg, #e8c170, #d4a24c);
+  box-shadow: 0 6px 22px rgba(212, 162, 76, 0.28);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
+}
+.nav-contact:hover, .nav-contact:focus-visible {
+  transform: translateY(-2px); filter: brightness(1.06);
+  box-shadow: 0 10px 28px rgba(212, 162, 76, 0.42);
+}
+@media (max-width: 640px) {
+  .nav-contact { padding: 9px 12px; }
+  .nav-contact span { display: none; }
+  .nav-contact svg { width: 20px; height: 20px; }
+}
+
+/* Admin : 3 cartes de stats (la carte Messages n'existe plus) */
+.admin-stats { grid-template-columns: repeat(3, 1fr); }
+@media (max-width: 800px) { .admin-stats { grid-template-columns: repeat(2, 1fr); } }
+
+/* ---------- Section À propos (accueil) ---------- */
+.ap {
+  position: relative; overflow: hidden; isolation: isolate;
+  min-height: calc(100vh + 160px); display: flex; align-items: center;
+  padding: calc(clamp(170px, 30vh, 320px) + 40px) 0 90px;
+  background:
+    radial-gradient(ellipse 60% 70% at 22% 85%, rgba(163, 38, 56, 0.34), transparent 70%),
+    radial-gradient(ellipse 70% 60% at 80% 20%, rgba(242, 165, 142, 0.07), transparent 70%),
+    #2a1114;
+}
+.ap-motifs {
+  position: absolute; inset: auto 0 0 0; height: 78%; z-index: 0; pointer-events: none;
+  background: url('/motifs-bas.jpg') 0 0 / 1104px 1644px repeat;
+  mix-blend-mode: screen; opacity: 0.34;
+  -webkit-mask-image: linear-gradient(to top, #000 8%, transparent 100%);
+  mask-image: linear-gradient(to top, #000 8%, transparent 100%);
+  animation: ap-drift 90s linear infinite;
+}
+@keyframes ap-drift { from { background-position: 0 0; } to { background-position: 0 -1644px; } }
+@keyframes ap-drift-sm { from { background-position: 0 0; } to { background-position: 0 -893px; } }
+
+.ap::before, .ap::after { content: ''; position: absolute; left: 0; right: 0; z-index: 1; pointer-events: none; }
+.ap::before { top: 0; height: calc(clamp(170px, 30vh, 320px) + 330px); background: linear-gradient(to bottom, #000 0%, rgba(20, 8, 10, 0.92) 12%, rgba(242, 165, 142, 0.34) 52%, rgba(242, 165, 142, 0.12) 78%, transparent 100%); }
+.ap::after { bottom: 0; height: clamp(120px, 22vh, 220px); background: linear-gradient(to top, #1c0a0d, rgba(28, 10, 13, 0.6) 45%, transparent); }
+.ap-inner {
+  position: relative; z-index: 2; width: 100%;
+  display: grid; grid-template-columns: 1fr 1fr; gap: clamp(24px, 4vw, 72px); align-items: center;
+}
+.ap-inner.wrap { max-width: 1640px; padding-inline: clamp(16px, 3vw, 48px); }
+
+/* --- Carte façon Instagram, la tête dépasse du cadre --- */
+.ap-photo {
+  --w: min(700px, 41vw, calc((100vh - 60px) / 1.62));
+  justify-self: start; margin-left: clamp(30px, 6.5vw, 150px); width: var(--w); padding-top: calc(var(--w) * 0.2);
+}
+.ap-insta {
+  position: relative; width: 100%; background: #fff7f0; color: #2a1114;
+  border-radius: calc(var(--w) * 0.05); padding: 0 0 calc(var(--w) * 0.03);
+  box-shadow: 0 30px 60px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(232, 193, 112, 0.35);
+}
+.ap-insta-head {
+  position: relative; z-index: 1; display: flex; align-items: center; gap: 10px;
+  padding: calc(var(--w) * 0.035) calc(var(--w) * 0.045);
+  font-size: clamp(0.72rem, calc(var(--w) * 0.034), 0.95rem); font-weight: 600;
+}
+.ap-insta-avatar {
+  width: 2.3em; height: 2.3em; border-radius: 50%; display: grid; place-items: center; flex: none;
+  background: linear-gradient(135deg, #e8c170, #d4a24c); color: #1c0a0d; font-weight: 700;
+}
+.ap-insta-dots { margin-left: auto; letter-spacing: 0.15em; opacity: 0.7; }
+.ap-insta-window {
+  position: relative; z-index: 2; margin: 0; aspect-ratio: 1 / 1.08;
+  background:
+    radial-gradient(ellipse 70% 60% at 50% 85%, rgba(232, 193, 112, 0.28), transparent 70%),
+    linear-gradient(160deg, #6b1c28, #3a1218 70%);
+  clip-path: inset(-40% 0 0 0);
+}
+.ap-insta-window img {
+  position: absolute; left: 0; bottom: 0; width: 100%; height: auto; min-height: 116%;
+  object-fit: cover; object-position: bottom center; display: block;
+  filter: drop-shadow(0 10px 24px rgba(0, 0, 0, 0.35));
+}
+.ap-insta-foot { padding: calc(var(--w) * 0.03) calc(var(--w) * 0.045) 0; font-size: clamp(0.7rem, calc(var(--w) * 0.032), 0.9rem); }
+.ap-insta-icons { display: flex; align-items: center; gap: 14px; margin-bottom: 8px; }
+.ap-insta-icons svg { width: 1.7em; height: 1.7em; }
+.ap-insta-icons .heart { color: #ed4956; }
+.ap-insta-icons .save { margin-left: auto; }
+.ap-insta-foot p { line-height: 1.4; }
+
+/* --- Nuages (apparaissent au scroll) --- */
+.ap-clouds { position: absolute; top: 0; left: 0; right: 0; height: calc(clamp(170px, 30vh, 320px) + 220px); z-index: 1; pointer-events: none; }
+.ap-cloud {
+  position: absolute; display: block; border-radius: 50%; filter: blur(34px);
+  background: radial-gradient(closest-side, rgba(242, 165, 142, 0.62), rgba(242, 165, 142, 0.22) 60%, transparent);
+}
+.ap-cloud.c1 { left: 4%; top: 22%; width: 34vw; height: 150px; }
+.ap-cloud.c2 { right: 2%; top: 30%; width: 38vw; height: 170px; }
+.ap-cloud.c3 { left: 28%; top: 48%; width: 30vw; height: 130px; }
+.ap-cloud.c4 { right: 24%; top: 56%; width: 28vw; height: 120px; }
+.ap-cloud.c5 { left: 8%; top: 70%; width: 46vw; height: 120px; opacity: 0.8; }
+
+/* --- Texte --- */
+.ap-text { min-width: 0; }
+.ap-eyebrow {
+  display: inline-block; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.22em;
+  text-transform: uppercase; color: #d4a24c; margin-bottom: 12px;
+}
+.ap-title {
+  font-family: 'Anton', sans-serif; font-weight: 400; text-transform: uppercase; line-height: 1.12; letter-spacing: 0.01em;
+  font-size: clamp(2.2rem, min(4vw, 6.6vh), 4rem); margin-bottom: clamp(12px, 2.2vh, 22px);
+}
+.ap-title em { font-family: 'Caveat', cursive; font-style: normal; font-weight: 600; text-transform: none; font-size: 1.18em; color: #e8c170; letter-spacing: 0; }
+.ap-text p {
+  color: #ecd9d2; font-size: clamp(1rem, min(1.3vw, 2.5vh), 1.25rem); line-height: 1.65;
+  margin-bottom: clamp(12px, 2vh, 20px); max-width: 62ch;
+}
+.ap-text p.ap-tagline {
+  font-family: 'Anton', sans-serif; text-transform: uppercase; letter-spacing: 0.04em;
+  color: #f2a58e; font-size: clamp(0.95rem, 2.2vh, 1.1rem); margin: clamp(10px, 2vh, 18px) 0 clamp(12px, 2.2vh, 20px);
+}
+.ap-facts {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px;
+  padding: clamp(10px, 1.8vh, 16px) 0;
+  max-width: 560px;
+}
+.ap-fact { display: flex; align-items: center; gap: 12px; }
+.ap-fact-icon {
+  flex: none; width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center;
+  background: linear-gradient(135deg, #e8c170, #d4a24c); color: #1c0a0d;
+}
+.ap-fact-icon svg { width: 20px; height: 20px; }
+.ap-fact small { display: block; font-size: 0.72rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #d4a24c; }
+.ap-fact strong { display: block; font-size: 1.05rem; font-weight: 600; line-height: 1.3; }
+.ap-links { display: flex; flex-wrap: wrap; gap: 10px; margin-top: clamp(12px, 2.2vh, 20px); }
+.ap-links a {
+  display: inline-flex; align-items: center; gap: 9px; padding: 9px 18px; border-radius: 999px;
+  border: 1px solid rgba(232, 193, 112, 0.55); color: #f7ece2; font-size: 0.95rem; font-weight: 600;
+  transition: background 0.2s ease, color 0.2s ease, transform 0.2s ease, border-color 0.2s ease;
+}
+.ap-links a svg { width: 18px; height: 18px; }
+.ap-links a:hover, .ap-links a:focus-visible {
+  background: linear-gradient(135deg, #e8c170, #d4a24c); color: #1c0a0d; border-color: transparent; transform: translateY(-2px);
+}
+
+@media (max-width: 820px) {
+  .ap { min-height: 0; padding: 48px 0 40px; }
+  .ap-inner { grid-template-columns: 1fr; gap: 36px; }
+  .ap-motifs { background-size: 600px 893px; animation-name: ap-drift-sm; height: 60%; }
+  .ap-photo { --w: min(86vw, 400px); order: 2; justify-self: center; margin-left: 0; }
+  .ap { padding: 200px 0 70px; min-height: 0; }
+  .ap-cloud { filter: blur(24px); }
+  .ap-text { order: 1; }
+  .ap-text p { font-size: 1rem; }
+  .ap-title { font-size: clamp(1.8rem, 7vw, 2.4rem); }
+  .ap-facts { grid-template-columns: 1fr; }
+}
+@media (prefers-reduced-motion: reduce) { .ap-motifs { animation: none; } }
+
+/* Plus de petite ligne entre « À propos » et « Projets Développement » */
+.ap + .teaser { border-top: none; }
+
+/* ---------- Projets développement : transition + fond clair ---------- */
+.dev-band {
+  --dev-sky: clamp(230px, 36vh, 400px);
+  --dev-fade: clamp(380px, 64vh, 680px);
+  position: relative; overflow: hidden; isolation: isolate;
+  padding-top: calc(var(--dev-sky) + 70px);
+  background:
+    linear-gradient(to bottom, #1c0a0d 0, #3d1219 calc(var(--dev-sky) * 0.22), #8a3a44 calc(var(--dev-sky) * 0.5),
+      #e49a87 calc(var(--dev-sky) * 0.8), #f7ece2 calc(var(--dev-sky) * 1.1), #f7ece2 100%);
+  color: #2a1114;
+}
+.dev-band::after {
+  content: ''; position: absolute; left: 0; right: 0; bottom: 0; height: var(--dev-fade); z-index: 0; pointer-events: none;
+  background: linear-gradient(to bottom, rgba(247, 236, 226, 0) 0%, rgba(243, 217, 207, 0.55) 12%, rgba(233, 179, 163, 0.85) 26%, #c27580 42%, #8a3a48 58%, #4a1822 74%, #2a1015 88%, #1c0a0d 100%);
+}
+.dev-clouds { height: calc(var(--dev-sky) + 160px); z-index: 0; }
+.dev-clouds .ap-cloud { background: radial-gradient(closest-side, rgba(247, 236, 226, 0.7), rgba(242, 165, 142, 0.25) 60%, transparent); }
+.dev-sec { position: relative; z-index: 1; border-top: none !important; padding-top: 0; padding-bottom: calc(var(--dev-fade) + 40px); }
+.dev-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 24px 40px; flex-wrap: wrap; margin-bottom: 44px; text-align: left; }
+.dev-eyebrow { display: inline-block; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: #7a1f2b; margin-bottom: 14px; }
+.dev-title {
+  font-family: 'Anton', sans-serif; font-weight: 400; text-transform: uppercase; line-height: 1.12; letter-spacing: 0.01em;
+  font-size: clamp(2.1rem, 4vw, 3.6rem); max-width: 26ch; color: #2a1114;
+}
+.dev-title em { font-family: 'Caveat', cursive; font-style: normal; font-weight: 600; text-transform: none; font-size: 1.18em; color: #a32638; letter-spacing: 0; }
+.dev-all {
+  display: inline-flex; align-items: center; gap: 10px; padding: 12px 24px; border-radius: 999px;
+  background: #7a1f2b; color: #f7ece2; font-size: 0.9rem; font-weight: 600;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+.dev-all:hover, .dev-all:focus-visible { background: #a32638; transform: translateY(-2px); }
+.dev-sec .project-mock { color: var(--cream); box-shadow: 0 26px 50px rgba(74, 21, 32, 0.28); border-color: rgba(122, 31, 43, 0.35); }
+@media (max-width: 820px) { .dev-band { --dev-sky: 200px; } .dev-head { align-items: flex-start; } }
+
+/* Motifs africains très discrets sur la section claire (aux extrémités) */
+.dev-motifs { position: absolute; inset: var(--dev-sky) 0 var(--dev-fade) 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.dev-motifs i {
+  position: absolute; display: block; width: min(30vw, 460px);
+  background: url('/motifs-clair.webp') 0 0 / 560px auto repeat;
+  mix-blend-mode: multiply; opacity: 0.1;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 22%, #000 78%, transparent), var(--dm-side);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to bottom, transparent, #000 22%, #000 78%, transparent), var(--dm-side);
+  mask-composite: intersect;
+}
+.dev-motifs .dm-r { --dm-side: linear-gradient(to left, #000 25%, transparent); right: 0; top: 4%; height: 62%; animation: dm-pulse 11s ease-in-out infinite, dm-drift 120s linear infinite; }
+.dev-motifs .dm-l { --dm-side: linear-gradient(to right, #000 25%, transparent); left: 0; bottom: 2%; height: 52%; animation: dm-pulse 14s ease-in-out -6s infinite, dm-drift 150s linear infinite reverse; }
+@keyframes dm-pulse { 0%, 100% { opacity: 0.04; } 50% { opacity: 0.32; } }
+@keyframes dm-drift { from { background-position: 0 0; } to { background-position: 0 -833px; } }
+@media (max-width: 820px) { .dev-motifs i { width: 42vw; } }
+@media (prefers-reduced-motion: reduce) { .dev-motifs i { animation: none; opacity: 0.08; } }
+
+/* Nuages du bas : du crème vers le marron */
+.dev-clouds-b { top: auto; bottom: 0; height: var(--dev-fade); z-index: 1; animation: cloud-float 20s ease-in-out infinite alternate;
+  -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent 88%); mask-image: linear-gradient(to bottom, #000 45%, transparent 88%); }
+@keyframes cloud-float { from { transform: translateX(-24px); } to { transform: translateX(24px); } }
+.dev-clouds-b .ap-cloud { filter: blur(38px); }
+.dev-clouds-b .c1 { top: 6%;  left: 2%;  width: 46vw; height: 230px; background: radial-gradient(closest-side, rgba(122, 31, 43, 0.5), rgba(163, 38, 56, 0.2) 60%, transparent); }
+.dev-clouds-b .c2 { top: 20%; right: 0;  left: auto; width: 50vw; height: 240px; background: radial-gradient(closest-side, rgba(122, 31, 43, 0.55), rgba(163, 38, 56, 0.2) 60%, transparent); }
+.dev-clouds-b .c3 { top: 36%; left: 22%; width: 42vw; height: 220px; background: radial-gradient(closest-side, rgba(247, 236, 226, 0.5), rgba(242, 165, 142, 0.2) 60%, transparent); }
+.dev-clouds-b .c4 { top: 50%; right: 6%; left: auto; width: 46vw; height: 220px; background: radial-gradient(closest-side, rgba(247, 200, 180, 0.42), rgba(242, 165, 142, 0.15) 60%, transparent); }
+.dev-clouds-b .c5 { top: 60%; left: 4%;  width: 48vw; height: 200px; background: radial-gradient(closest-side, rgba(247, 200, 180, 0.4), rgba(242, 165, 142, 0.14) 60%, transparent); }
+
+/* ---------- Projets infographie : fond sombre, titre soigné ---------- */
+.design-sec { border-top: none !important; padding-top: 30px; padding-bottom: 110px; }
+.design-sec .dev-eyebrow { color: #d4a24c; }
+.design-sec .dev-title { color: #f7ece2; }
+.design-sec .dev-title em { color: #e8c170; }
+.design-sec .dev-all { background: linear-gradient(135deg, #e8c170, #d4a24c); color: #1c0a0d; }
+.design-sec .dev-all:hover, .design-sec .dev-all:focus-visible { background: linear-gradient(135deg, #f0cd85, #dcab55); }
+
+/* Phrase d'accroche sous les titres */
+.dev-lead { margin-top: 18px; max-width: 56ch; font-size: clamp(1rem, 1.1vw, 1.15rem); line-height: 1.7; color: #5a3a3d; }
+.design-sec .dev-lead { color: #ecd9d2; }
+
+/* Motifs africains très discrets derrière les affiches */
+.design-band { position: relative; overflow: hidden; isolation: isolate; background: #1c0a0d; }
+.design-band .design-sec { position: relative; z-index: 1; }
+.design-motifs { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.design-motifs i {
+  position: absolute; display: block; width: min(30vw, 460px);
+  background: url('/motifs-bas.jpg') 0 0 / 600px auto repeat;
+  mix-blend-mode: screen; opacity: 0.06;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 22%, #000 78%, transparent), var(--dm-side);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to bottom, transparent, #000 22%, #000 78%, transparent), var(--dm-side);
+  mask-composite: intersect;
+}
+.design-motifs .dm-r { --dm-side: linear-gradient(to left, #000 25%, transparent); right: 0; top: 8%; height: 62%; animation: dmd-pulse 13s ease-in-out -3s infinite, dmd-drift 140s linear infinite; }
+.design-motifs .dm-l { --dm-side: linear-gradient(to right, #000 25%, transparent); left: 0; bottom: 4%; height: 56%; animation: dmd-pulse 16s ease-in-out -9s infinite, dmd-drift 170s linear infinite reverse; }
+@keyframes dmd-pulse { 0%, 100% { opacity: 0.02; } 50% { opacity: 0.2; } }
+@keyframes dmd-drift { from { background-position: 0 0; } to { background-position: 0 -893px; } }
+@media (max-width: 820px) { .design-motifs i { width: 42vw; } }
+@media (prefers-reduced-motion: reduce) { .design-motifs i { animation: none; opacity: 0.1; } }
+
+/* ---------- Chiffres + témoignages : bande claire (même ambiance que les projets dev) ---------- */
+.stats-band > section { position: relative; z-index: 1; }
+.stats-band .stats { border-top: none; padding: 0 0 70px; }
+.stats-band .stat { box-shadow: 0 26px 50px rgba(74, 21, 32, 0.28); border-color: rgba(122, 31, 43, 0.35); }
+.stats-band .testimonials { border-top: none; padding: 30px 0 calc(var(--dev-fade) + 30px); }
+.stats-band .testi-badge { border-color: rgba(122, 31, 43, 0.4); background: rgba(122, 31, 43, 0.08); color: #7a1f2b; font-weight: 700; letter-spacing: 0.22em; }
+.stats-band .testi-badge i { background: #7a1f2b; }
+.stats-band .testi-head { max-width: 760px; }
+.stats-band .testi-head h2 {
+  font-family: 'Anton', sans-serif; text-transform: uppercase; font-weight: 400; letter-spacing: 0.01em;
+  font-size: clamp(1.8rem, 3.4vw, 3rem); line-height: 1.15; color: #2a1114;
+}
+.stats-band .testi-head h2 span { font-family: 'Caveat', cursive; text-transform: none; font-weight: 600; font-size: 1.18em; color: #a32638; letter-spacing: 0; }
+.stats-band .testi-card { box-shadow: 0 26px 50px rgba(74, 21, 32, 0.28); border-color: rgba(122, 31, 43, 0.35); }
+.stats-band .testi-btn { background: #7a1f2b; color: #f7ece2; box-shadow: 0 14px 30px rgba(122, 31, 43, 0.3); }
+.stats-band .testi-btn:hover { background: #a32638; }
+.stats-band .testi-cta p, .stats-band .testi-empty { color: #5a3a3d; }
+.stats-band .testi-dots button { background: rgba(122, 31, 43, 0.25); }
+.stats-band .testi-dots button.active { background: #7a1f2b; }
+.stats-band .testi-overlay { color: var(--cream); }
+
+/* ---------- Phrase de fin ---------- */
+.quote-band .pull-quote { position: relative; z-index: 1; border-top: none; padding: clamp(100px, 16vh, 180px) 0; text-align: center; }
+.quote-band .pull-quote::before { content: '✦'; display: block; color: #d4a24c; font-size: 1.6rem; margin-bottom: 22px; }
+.quote-band .pull-quote p {
+  font-family: 'Anton', sans-serif; font-weight: 400; text-transform: uppercase; letter-spacing: 0.01em; line-height: 1.15;
+  font-size: clamp(2rem, 4.6vw, 3.9rem); max-width: 24ch; margin: 0 auto; color: #f7ece2; text-wrap: balance;
+}
+.quote-band .pull-quote p em { font-family: 'Caveat', cursive; font-style: normal; font-weight: 600; text-transform: none; font-size: 1.2em; color: #e8c170; letter-spacing: 0; }
+.stats-band { isolation: auto; }
+
+/* ---------- Section « Parlons-en » avant le footer ---------- */
+.cb {
+  position: relative; overflow: hidden; isolation: isolate; text-align: center;
+  padding: clamp(110px, 18vh, 190px) 0 clamp(120px, 20vh, 210px);
+  background:
+    radial-gradient(ellipse 64% 66% at 50% 50%, rgba(242, 165, 142, 0.5), rgba(217, 122, 108, 0.26) 52%, transparent 82%),
+    radial-gradient(ellipse 36% 32% at 50% 42%, rgba(247, 200, 180, 0.2), transparent 75%),
+    #1c0a0d;
+}
+.cb-watermark {
+  position: absolute; left: 50%; top: 46%; transform: translate(-50%, -50%); z-index: 0; pointer-events: none;
+  font-family: 'Anton', sans-serif; text-transform: uppercase; white-space: nowrap; line-height: 1;
+  font-size: clamp(4.5rem, 19vw, 17rem); color: rgba(108, 22, 34, 0.32); user-select: none;
+  -webkit-mask-image: linear-gradient(to bottom, #000 55%, transparent 100%); mask-image: linear-gradient(to bottom, #000 55%, transparent 100%);
+}
+.cb-motifs { position: absolute; inset: 0; z-index: 0; pointer-events: none; overflow: hidden; }
+.cb-motifs i {
+  position: absolute; display: block; width: min(26vw, 400px); height: 70%;
+  background: url('/motifs-bas.jpg') 0 0 / 560px auto repeat; mix-blend-mode: screen; opacity: 0.05;
+  -webkit-mask-image: linear-gradient(to bottom, transparent, #000 25%, #000 75%, transparent), var(--dm-side);
+  -webkit-mask-composite: source-in;
+  mask-image: linear-gradient(to bottom, transparent, #000 25%, #000 75%, transparent), var(--dm-side);
+  mask-composite: intersect;
+}
+.cb-motifs .dm-r { --dm-side: linear-gradient(to left, #000 25%, transparent); right: 0; top: 10%; animation: dmd-pulse 15s ease-in-out -4s infinite, dmd-drift 150s linear infinite; }
+.cb-motifs .dm-l { --dm-side: linear-gradient(to right, #000 25%, transparent); left: 0; bottom: 6%; animation: dmd-pulse 18s ease-in-out -10s infinite, dmd-drift 180s linear infinite reverse; }
+.cb-inner { position: relative; z-index: 1; padding: 0 clamp(20px, 5vw, 60px); }
+.cb-eyebrow { display: inline-block; font-size: 0.78rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: #d4a24c; margin-bottom: 22px; }
+.cb-title {
+  font-family: 'Anton', sans-serif; font-weight: 400; text-transform: uppercase; letter-spacing: 0.01em; line-height: 1.12;
+  font-size: clamp(2.2rem, 5vw, 4.4rem); max-width: 20ch; margin: 0 auto 38px; color: #f7ece2; text-wrap: balance;
+}
+.cb-title em { font-family: 'Caveat', cursive; font-style: normal; font-weight: 600; text-transform: none; font-size: 1.2em; color: #e8c170; letter-spacing: 0; display: inline-block; }
+.cb-btn {
+  display: inline-flex; align-items: center; gap: 18px; padding: 16px 38px; border-radius: 999px;
+  background: linear-gradient(135deg, #e8c170, #d4a24c); color: #1c0a0d; font-weight: 700; font-size: 1.02rem;
+  box-shadow: 0 16px 40px rgba(212, 162, 76, 0.32); transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.cb-btn i {
+  font-style: normal; display: grid; place-items: center; width: 46px; height: 46px; border-radius: 50%;
+  background: #4a1520; color: #f7ece2; font-size: 1.2rem; transition: transform 0.25s ease;
+}
+.cb-btn:hover, .cb-btn:focus-visible { transform: translateY(-3px); box-shadow: 0 22px 50px rgba(212, 162, 76, 0.45); }
+.cb-btn:hover i, .cb-btn:focus-visible i { transform: rotate(45deg); }
+.cb-info { display: flex; justify-content: center; flex-wrap: wrap; gap: 30px clamp(36px, 7vw, 100px); margin-top: clamp(54px, 9vh, 90px); text-align: left; }
+.cb-info small { display: block; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: #d4a24c; margin-bottom: 8px; }
+.cb-info a { color: #f7ece2; font-size: 1.08rem; font-weight: 600; transition: color 0.2s ease; }
+.cb-info a:hover, .cb-info a:focus-visible { color: #e8c170; }
+.cb-links { display: inline-flex; gap: 22px; }
+@media (max-width: 820px) { .cb-info { flex-direction: column; align-items: center; text-align: center; } .cb-motifs i { width: 40vw; } }
+@media (prefers-reduced-motion: reduce) { .cb-motifs i { animation: none; opacity: 0.08; } }
+
+/* ---------- Footer ---------- */
+footer.site.ft { border-top: none; padding: 0; background: linear-gradient(to bottom, #1c0a0d, #0f0607 60%); }
+.ft-grid { display: grid; grid-template-columns: 1.5fr 0.8fr 1fr 1.3fr; gap: 40px clamp(24px, 4vw, 70px); padding-top: 40px; padding-bottom: 54px; max-width: 1280px; }
+.ft-logo { display: inline-flex; flex-direction: column; gap: 2px; margin-bottom: 18px; }
+.ft-logo small { font-size: 0.68rem; font-weight: 700; letter-spacing: 0.3em; text-transform: uppercase; color: #d4a24c; }
+.ft-logo span { font-family: 'Anton', sans-serif; text-transform: uppercase; letter-spacing: 0.02em; font-size: 2.1rem; line-height: 1.05; color: #f7ece2; }
+.ft-brand p { color: #d9c3bd; font-size: 1rem; line-height: 1.7; max-width: 38ch; }
+.ft-brand .ft-script { font-family: 'Caveat', cursive; font-weight: 600; font-size: 1.9rem; color: #e8c170; margin-top: 14px; line-height: 1.2; }
+.ft-col { display: flex; flex-direction: column; gap: 14px; align-items: flex-start; }
+.ft-col h3 { font-family: 'Inter', sans-serif; font-size: 0.74rem; font-weight: 700; letter-spacing: 0.22em; text-transform: uppercase; color: #d4a24c; margin-bottom: 6px; }
+.ft-col a, .ft-col > span { color: #ecd9d2; font-size: 1rem; transition: color 0.2s ease; }
+.ft-col a:hover, .ft-col a:focus-visible { color: #e8c170; }
+.ft-col .ft-phone { font-weight: 700; font-size: 1.15rem; color: #f7ece2; }
+.ft-social { display: inline-flex; gap: 20px; }
+.ft-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; max-width: 1280px; padding-top: 22px; padding-bottom: 30px; color: #b79b97; font-size: 0.9rem; }
+.ft-bottom button { background: none; border: none; color: #d9c3bd; font: inherit; cursor: pointer; transition: color 0.2s ease; }
+.ft-bottom button:hover, .ft-bottom button:focus-visible { color: #e8c170; }
+@media (max-width: 900px) { .ft-grid { grid-template-columns: 1fr 1fr; } .ft-brand { grid-column: 1 / -1; } }
+@media (max-width: 520px) { .ft-grid { grid-template-columns: 1fr; } }
+
+/* Chiffres clés dans le footer (sans cartes) */
+.ft-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 30px clamp(24px, 4vw, 70px); max-width: 1280px; padding-top: 10px; padding-bottom: 64px; }
+.ft-stats h3 {
+  font-family: 'Anton', sans-serif; font-weight: 400; font-size: clamp(3rem, 6vw, 5rem); line-height: 1;
+  background: linear-gradient(180deg, #f7ece2 0%, #e8c170 60%, #d4a24c 100%); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: #e8c170;
+}
+.ft-stats p { margin-top: 10px; color: #d9c3bd; font-size: 0.98rem; line-height: 1.55; max-width: 30ch; }
+@media (max-width: 700px) { .ft-stats { grid-template-columns: 1fr; } }
+
+/* ---------- Transition « Le code donne vie… » → « Parlons-en » : un seul dégradé continu, nuages fondus dedans ---------- */
+.cb-wrap { --cb-top: clamp(240px, 38vh, 420px); position: relative; background: #1c0a0d; }
+.cb-wrap .cb { padding-top: calc(var(--cb-top) + 20px); }
+/* le halo saumon de « Parlons-en » monte jusqu'en haut de la zone : plus de vide sombre */
+.cb-wrap .cb {
+  background:
+    radial-gradient(ellipse 120% 46% at 50% 0%, rgba(217, 122, 108, 0.34), rgba(163, 70, 70, 0.14) 55%, transparent 80%),
+    radial-gradient(ellipse 64% 66% at 50% 52%, rgba(242, 165, 142, 0.5), rgba(217, 122, 108, 0.26) 52%, transparent 82%),
+    radial-gradient(ellipse 36% 32% at 50% 44%, rgba(247, 200, 180, 0.2), transparent 75%),
+    #1c0a0d;
+}
+/* le marron du haut se fond très progressivement (courbe douce, sans palier) */
+.cb-wrap::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: calc(var(--cb-top) * 0.9); z-index: 1; pointer-events: none;
+  background: linear-gradient(to bottom, #1c0a0d 0%, rgba(28, 10, 13, 0.9) 12%, rgba(28, 10, 13, 0.7) 28%, rgba(28, 10, 13, 0.45) 46%, rgba(28, 10, 13, 0.22) 64%, rgba(28, 10, 13, 0.08) 82%, transparent 100%);
+}
+/* mêmes nuages que « À propos », mais plus doux et fondus dans le halo (pas de taches isolées) */
+.cb-wrap .ap-clouds {
+  height: calc(var(--cb-top) + 40px); z-index: 1;
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0%, #000 38%, #000 66%, transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0%, #000 38%, #000 66%, transparent 100%);
+}
+.cb-wrap .ap-cloud { filter: blur(56px); }
+.cb-wrap .ap-cloud.c1 { top: 38%; }
+.cb-wrap .ap-cloud.c2 { top: 44%; }
+.cb-wrap .ap-cloud.c3 { top: 56%; }
+.cb-wrap .ap-cloud.c4 { top: 62%; }
+.cb-wrap .ap-cloud.c5 { top: 72%; }
+.cb-wrap .ap-cloud { background: radial-gradient(closest-side, rgba(242, 165, 142, 0.38), rgba(217, 122, 108, 0.16) 60%, transparent); }
+@media (max-width: 820px) { .cb-wrap { --cb-top: 190px; } .cb-wrap .ap-cloud { filter: blur(36px); } }

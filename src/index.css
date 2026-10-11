@@ -356,7 +356,7 @@ footer.site {
 }
 
 .hero-photo {
-  width: min(32vw, 400px);
+  width: min(32vw, 440px);
   height: 100%;
   display: block;
   object-fit: contain;
@@ -365,13 +365,6 @@ footer.site {
   filter: drop-shadow(0 24px 50px rgba(0, 0, 0, 0.45));
 }
 
-.hero-photo-placeholder {
-  display: block;
-  max-width: 240px;
-  text-align: center;
-  color: var(--muted);
-  font-size: 0.95rem;
-}
 
 .hero-columns {
   position: absolute;
@@ -384,7 +377,7 @@ footer.site {
   justify-content: space-between;
   align-items: center;
   gap: clamp(16px, 3vw, 40px);
-  padding: 0 clamp(20px, 5vw, 60px);
+  padding: 0 clamp(20px, 5vw, 0px);
 }
 
 .hero-col {
@@ -402,7 +395,7 @@ footer.site {
 .hero-label {
   font-family: 'Anton', sans-serif;
   text-transform: uppercase;
-  font-size: clamp(1.3rem, 3.1vw, 2.2rem);
+  font-size: clamp(3.7rem, 3.1vw, 2.2rem);
   line-height: 1.05;
   color: var(--cream);
 }
@@ -415,7 +408,7 @@ footer.site {
 .hero-copy-text {
   color: var(--muted);
   max-width: 30ch;
-  font-size: 0.9rem;
+  font-size: 1.2rem;
   margin-top: 4px;
 }
 
@@ -6529,8 +6522,21 @@ body.is-universe footer.site {
   opacity: 0.4;
   transition: opacity 0.6s ease;
 }
+
+/* Phrase « Au bout du fil… » : simple, police Inter, toute blanche */
+.thread-end-card {
+  margin: 26px 0 0;
+  font-family: 'Inter', system-ui, sans-serif;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: #fff;
+  opacity: 0.4;
+  transition: opacity 0.6s ease;
+}
 .thread-end.is-lit .thread-end-card { opacity: 1; }
-.thread-end-card em { font-style: normal; color: var(--gold-soft); }
+.thread-end-card em { font-style: normal; color: #fff; }
+
 
 @media (max-width: 680px) {
   .thread-step,
@@ -6728,3 +6734,81 @@ body.is-universe footer.site {
 .ink-flash.is-fade .ink-card svg {
   opacity: 0;
 }
+
+
+/* ---- « Et ce n'est pas tout… » : texte simple + bandeau qui défile ---- */
+.outro-extra {
+  max-width: 1000px;
+  margin: clamp(40px, 6vw, 64px) auto 0;
+  text-align: center;
+}
+.outro-extra-lead {
+  margin: 0;
+  font-family: 'Caveat', cursive;
+  font-size: clamp(2rem, 4.4vw, 2.8rem);
+  line-height: 1;
+  background: linear-gradient(90deg, var(--gold-soft), var(--rose));
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+.outro-extra-text {
+  max-width: 44ch;
+  margin: 16px auto 0;
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(0.98rem, 1.6vw, 1.1rem);
+  line-height: 1.7;
+  color: var(--cream);
+}
+.outro-band {
+  position: relative;
+  margin: 26px 0;
+  padding: 14px 0;
+  overflow: hidden;
+  border-top: 1px solid rgba(233, 196, 106, 0.25);
+  border-bottom: 1px solid rgba(233, 196, 106, 0.25);
+  -webkit-mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+  mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent);
+}
+.outro-band-track {
+  display: flex;
+  width: max-content;
+  animation: outro-band 60s linear infinite;
+}
+.outro-band-set {
+  display: flex;
+  flex-shrink: 0;
+}
+.outro-band-set span {
+  display: inline-flex;
+  align-items: center;
+  gap: 26px;
+  padding-right: 26px;
+  font-family: 'Inter', sans-serif;
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  white-space: nowrap;
+  color: var(--gold-soft);
+}
+.outro-band-set span i {
+  font-style: normal;
+  font-size: 0.7em;
+  color: var(--gold);
+  opacity: 0.8;
+}
+@keyframes outro-band {
+  to { transform: translateX(-50%); }
+}
+.outro-extra-sub {
+  margin: 0;
+  font-family: 'Inter', sans-serif;
+  font-size: 0.95rem;
+  letter-spacing: 0.02em;
+  color: var(--rose);
+}
+@media (prefers-reduced-motion: reduce) {
+  .outro-band-track { animation: none; }
+}
+
+

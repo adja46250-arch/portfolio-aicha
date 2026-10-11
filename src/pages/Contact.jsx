@@ -7,33 +7,34 @@ import { SocialIcons } from '../components/SocialIcons'
 // ---- Tes coordonnées : modifie ici ------------------------------------
 // Numéro WhatsApp avec l'indicatif du pays, sans le "+" (ex. "225 07 00 00 00 00").
 // Tant que ce champ est vide, la carte WhatsApp ne s'affiche pas.
-const WHATSAPP_NUMBER = '225 0142396729'
+const WHATSAPP_NUMBER = '225 01 42 39 67 29'
 const WHATSAPP_MESSAGE = "Bonjour Aïcha, j'ai vu ton portfolio et j'aimerais discuter d'un projet."
 
-const EMAIL = 'adja46250@gmail.com'
+const EMAIL = 'hello@aicha.com'
 
-// Clé publique Web3Forms : chaque message arrive dans ta boîte mail.
+// Clé publique Web3Forms (https://web3forms.com) : elle fait arriver chaque message
+// directement dans ta boîte mail. Mets-la dans .env : VITE_WEB3FORMS_KEY=...
 const WEB3FORMS_KEY = import.meta.env.VITE_WEB3FORMS_KEY || ''
 
-// Message pré-rempli quand on arrive depuis « Demander mon CV »
+// Message pré-rempli quand on arrive depuis le bouton « Demander mon CV »
 const CV_MESSAGE =
   "Bonjour Aïcha,\n\nJe souhaiterais recevoir votre CV. Merci d'avance.\n\nCordialement,"
 
 // Un bouton ne s'affiche que si son lien n'est pas vide : laisse '' pour le masquer.
 const SOCIAL_LINKS = [
-  { key: 'linkedin', label: 'LinkedIn', href: 'https://www.linkedin.com/in/adja-aïcha-diarra-b68701386' },
+  { key: 'linkedin', label: 'LinkedIn', href: 'https://www.linkedin.com/in/adja-a%C3%AFcha-diarra-b68701386/' },
   { key: 'github', label: 'GitHub', href: 'https://github.com/adja46250-arch' },
   { key: 'tiktok', label: 'TikTok', href: '' },
   { key: 'facebook', label: 'Facebook', href: '' },
 ]
 
 export default function Contact() {
-const [params] = useSearchParams()
-const [form, setForm] = useState({
-  name: '',
-  email: '',
-  message: params.get('objet') === 'cv' ? CV_MESSAGE : '',
-})
+  const [params] = useSearchParams()
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    message: params.get('objet') === 'cv' ? CV_MESSAGE : '',
+  })
   const [status, setStatus] = useState(null) // null | 'sending' | 'success' | 'error'
 
   function update(field, value) {
@@ -41,56 +42,56 @@ const [form, setForm] = useState({
   }
 
   async function handleSubmit(e) {
-  e.preventDefault()
+    e.preventDefault()
 
-  if (!isSupabaseConfigured && !WEB3FORMS_KEY) {
-    setStatus('error')
-    return
-  }
+    if (!isSupabaseConfigured && !WEB3FORMS_KEY) {
+      setStatus('error')
+      return
+    }
 
-  setStatus('sending')
+    setStatus('sending')
 
-  // 1) Archive dans Supabase (visible dans l'admin)
-  const saved = isSupabaseConfigured
-    ? await supabase
-        .from('messages')
-        .insert({ name: form.name, email: form.email, message: form.message })
-        .then(({ error }) => {
-          if (error) console.error(error.message)
-          return !error
+    // 1) Archive dans Supabase (visible dans l'admin)
+    const saved = isSupabaseConfigured
+      ? await supabase
+          .from('messages')
+          .insert({ name: form.name, email: form.email, message: form.message })
+          .then(({ error }) => {
+            if (error) console.error(error.message)
+            return !error
+          })
+      : false
+
+    // 2) Notification par e-mail dans ta boîte (Web3Forms)
+    let mailed = false
+    if (WEB3FORMS_KEY) {
+      try {
+        const res = await fetch('https://api.web3forms.com/submit', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({
+            access_key: WEB3FORMS_KEY,
+            subject: `Portfolio : message de ${form.name}`,
+            from_name: 'Portfolio Aïcha',
+            name: form.name,
+            email: form.email,
+            message: form.message,
+          }),
         })
-    : false
+        const data = await res.json()
+        mailed = Boolean(data.success)
+      } catch (err) {
+        console.error(err)
+      }
+    }
 
-  // 2) Notification par e-mail dans ta boîte (Web3Forms)
-  let mailed = false
-  if (WEB3FORMS_KEY) {
-    try {
-      const res = await fetch('https://api.web3forms.com/submit', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-        body: JSON.stringify({
-          access_key: WEB3FORMS_KEY,
-          subject: `Portfolio : message de ${form.name}`,
-          from_name: 'Portfolio Aïcha',
-          name: form.name,
-          email: form.email,
-          message: form.message,
-        }),
-      })
-      const data = await res.json()
-      mailed = Boolean(data.success)
-    } catch (err) {
-      console.error(err)
+    if (saved || mailed) {
+      setStatus('success')
+      setForm({ name: '', email: '', message: '' })
+    } else {
+      setStatus('error')
     }
   }
-
-  if (saved || mailed) {
-    setStatus('success')
-    setForm({ name: '', email: '', message: '' })
-  } else {
-    setStatus('error')
-  }
-}
 
   const links = SOCIAL_LINKS.filter((s) => s.href)
   const waDigits = WHATSAPP_NUMBER.replace(/\D/g, '')
@@ -165,9 +166,9 @@ const [form, setForm] = useState({
           )}
           {status === 'error' && (
             <p className="form-status error">
-              {isSupabaseConfigured
+              {isSupabaseConfigured || WEB3FORMS_KEY
                 ? "Une erreur s'est produite, réessaie dans un instant."
-                : "Le formulaire n'est pas encore branché à Supabase (voir .env.example)."}
+                : "Le formulaire n'est pas encore branché (voir .env.example)."}
             </p>
           )}
         </form>

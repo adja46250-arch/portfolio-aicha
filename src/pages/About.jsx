@@ -4,7 +4,6 @@ import Reveal from '../components/Reveal'
 import { SkillIcons } from '../components/SkillIcons'
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient'
 
-
 // Parcours affiché sur la page (modifiable ici, dans le code).
 const DEFAULT_FORMATIONS = [
   {
@@ -220,14 +219,6 @@ export default function About() {
             <p className="eyebrow">Parcours, compétences, projets</p>
             <h2>Mon CV</h2>
             <p>Disponible sur simple demande, je vous l'envoie par e-mail.</p>
-            <div className="cv-actions">
-              <Link className="cv-btn cv-btn-main" to="/contact?objet=cv">
-                Demander mon CV
-                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                  <path d="M5 12h14M13 6l6 6-6 6" />
-                </svg>
-              </Link>
-            </div>
           </div>
         </div>
       </Reveal>

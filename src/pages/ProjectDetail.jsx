@@ -231,13 +231,6 @@ export default function ProjectDetail() {
           )}
         </section>
       )}
-
-      <section className="wrap detail-cta">
-        <p>Un projet en tête ? Parlons-en.</p>
-        <Link to="/contact" className="btn btn-solid">
-          Me contacter →
-        </Link>
-      </section>
     </main>
   )
 }

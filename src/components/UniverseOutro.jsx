@@ -14,7 +14,8 @@ const STEPS = [
   { name: 'Voyage', gift: "L'ouverture aux autres", target: '.travel-section' },
 ]
 
-const AND_MORE = ['Maquillage pour événements', 'Décoration']
+// La phrase qui défile dans le bandeau (change-la librement)
+const PHRASE = 'Entre un crayon, un fil et un horizon, je tisse mon univers.'
 
 export default function UniverseOutro() {
   const box = useRef(null)
@@ -129,27 +130,28 @@ export default function UniverseOutro() {
           </div>
         </div>
 
-        <div className="outro-more">
-          <span className="outro-more-lead">Et ce n'est pas tout…</span>
-          <p>
+        <div className="outro-extra">
+          <p className="outro-extra-lead">Et ce n'est pas tout…</p>
+          <p className="outro-extra-text">
             Je maquille aussi pour des événements, je fais de la décoration, et bien d'autres choses encore.
           </p>
-          <div className="outro-more-tags">
-            {AND_MORE.map((t) => (
-              <span key={t}>{t}</span>
-            ))}
-            <span className="is-more">…et la suite</span>
-          </div>
-          <span className="outro-more-sub">Je vous laisse le plaisir de me découvrir plus tard.</span>
-        </div>
 
-        <div className="outro-actions">
-          <Link to="/projets" className="outro-btn outro-btn-main">
-            Voir mes projets
-          </Link>
-          <Link to="/contact" className="outro-btn">
-            Me contacter
-          </Link>
+          <div className="outro-band" aria-hidden="true">
+            <div className="outro-band-track">
+              {[0, 1].map((k) => (
+                <div className="outro-band-set" key={k}>
+                  {[0, 1, 2].map((n) => (
+                    <span key={n}>
+                      {PHRASE}
+                      <i>✦</i>
+                    </span>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          <p className="outro-extra-sub">Je vous laisse le plaisir de le découvrir plus tard.</p>
         </div>
 
         <Link to="/parcours" className="outro-back eyebrow">

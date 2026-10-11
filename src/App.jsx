@@ -1,4 +1,4 @@
-import { Routes, Route, useLocation } from 'react-router-dom'
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom'
 import { AnimatePresence, motion } from 'framer-motion'
 import Header from './components/Header'
 import Footer from './components/Footer'
@@ -9,7 +9,6 @@ import ProjectDetail from './pages/ProjectDetail'
 import About from './pages/About'
 import Universe from './pages/Universe'
 import DrawingGallery from './pages/DrawingGallery'
-import Contact from './pages/Contact'
 import Admin from './pages/Admin'
 
 const pageVariants = {
@@ -52,7 +51,7 @@ export default function App() {
           <Route path="/parcours" element={<Page><About /></Page>} />
           <Route path="/univers" element={<Page><Universe /></Page>} />
           <Route path="/univers/dessins" element={<Page><DrawingGallery /></Page>} />
-          <Route path="/contact" element={<Page><Contact /></Page>} />
+          <Route path="/contact" element={<Navigate to="/" replace />} />
           <Route path="/admin" element={<Page><Admin /></Page>} />
         </Routes>
       </AnimatePresence>

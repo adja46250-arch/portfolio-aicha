@@ -147,7 +147,6 @@ export default function Admin() {
   const [loginError, setLoginError] = useState('')
 
   const [projects, setProjects] = useState([])
-  const [messages, setMessages] = useState([])
   const [testimonials, setTestimonials] = useState([])
   const [testiForm, setTestiForm] = useState({
     name: '',
@@ -174,6 +173,10 @@ export default function Admin() {
   const [aboutUploading, setAboutUploading] = useState(false)
   const [aboutError, setAboutError] = useState('')
 
+  const [homeAboutImage, setHomeAboutImage] = useState('')
+  const [homeAboutUploading, setHomeAboutUploading] = useState(false)
+  const [homeAboutError, setHomeAboutError] = useState('')
+
   useEffect(() => {
     if (!isSupabaseConfigured) {
       setCheckingSession(false)
@@ -190,12 +193,21 @@ export default function Admin() {
   useEffect(() => {
     if (session) {
       loadProjects()
-      loadMessages()
       loadTestimonials()
       loadHeroImage()
       loadAboutImage()
+      loadHomeAboutImage()
     }
   }, [session])
+
+  async function loadHomeAboutImage() {
+    const { data, error } = await supabase
+      .from('settings')
+      .select('home_about_image')
+      .eq('id', 1)
+      .single()
+    if (!error) setHomeAboutImage(data?.home_about_image || '')
+  }
 
   async function loadAboutImage() {
     const { data, error } = await supabase
@@ -221,15 +233,6 @@ export default function Admin() {
       .select('*')
       .order('created_at', { ascending: true })
     if (!error) setProjects(data || [])
-  }
-
-  async function loadMessages() {
-    const { data, error } = await supabase
-      .from('messages')
-      .select('*')
-      .order('created_at', { ascending: false })
-      .limit(100)
-    if (!error) setMessages(data || [])
   }
 
   async function loadTestimonials() {
@@ -470,6 +473,49 @@ export default function Admin() {
     e.target.value = ''
   }
 
+  async function handleHomeAboutUpload(e) {
+    const file = e.target.files?.[0]
+    if (!file) return
+
+    setHomeAboutUploading(true)
+    setHomeAboutError('')
+
+    const safeName = file.name.replace(/[^a-zA-Z0-9.\-_]/g, '-')
+    const path = `home-about-${Date.now()}-${safeName}`
+
+    const { error: uploadErr } = await supabase.storage
+      .from(IMAGE_BUCKET)
+      .upload(path, file, { cacheControl: '3600', upsert: false })
+
+    if (uploadErr) {
+      setHomeAboutError(
+        uploadErr.message.includes('Bucket not found')
+          ? `Le bucket "${IMAGE_BUCKET}" n'existe pas encore — crée-le dans Supabase (Storage > New bucket, coché "Public").`
+          : uploadErr.message
+      )
+      setHomeAboutUploading(false)
+      e.target.value = ''
+      return
+    }
+
+    const { data } = supabase.storage.from(IMAGE_BUCKET).getPublicUrl(path)
+
+    const { error: saveErr } = await supabase
+      .from('settings')
+      .upsert({ id: 1, home_about_image: data.publicUrl })
+
+    if (saveErr) {
+      setHomeAboutError(saveErr.message)
+      setHomeAboutUploading(false)
+      e.target.value = ''
+      return
+    }
+
+    setHomeAboutImage(data.publicUrl)
+    setHomeAboutUploading(false)
+    e.target.value = ''
+  }
+
   async function handleSave(e) {
     e.preventDefault()
     setSavingError('')
@@ -628,11 +674,6 @@ export default function Admin() {
           <span>Sites en ligne</span>
           <small>{wipCount} en cours</small>
         </div>
-        <div className="admin-stat">
-          <strong>{messages.length}</strong>
-          <span>Messages reçus</span>
-          <small>via le formulaire de contact</small>
-        </div>
         <div className={`admin-stat${pendingCount > 0 ? ' alert' : ''}`}>
           <strong>{pendingCount}</strong>
           <span>Avis à valider</span>
@@ -644,7 +685,6 @@ export default function Admin() {
         {[
           ['projects', 'Projets'],
           ['testimonials', 'Témoignages'],
-          ['messages', 'Messages'],
           ['parcours', 'Parcours'],
           ['settings', 'Réglages'],
         ].map(([key, label]) => (
@@ -657,9 +697,6 @@ export default function Admin() {
             {label}
             {key === 'testimonials' && pendingCount > 0 && (
               <span className="admin-badge">{pendingCount}</span>
-            )}
-            {key === 'messages' && messages.length > 0 && (
-              <span className="admin-badge muted">{messages.length}</span>
             )}
           </button>
         ))}
@@ -1083,42 +1120,6 @@ export default function Admin() {
         </>
       )}
 
-      {tab === 'messages' && (
-        <>
-          <div className="admin-list-head">
-            <h2>Messages reçus</h2>
-          </div>
-          {messages.length === 0 ? (
-            <p className="admin-empty">Aucun message pour l'instant.</p>
-          ) : (
-            <div className="admin-stack-list">
-              {messages.map((m) => (
-                <article key={m.id} className="admin-item">
-                  <div className="admin-item-top">
-                    <div className="admin-avatar">{(m.name || '?').charAt(0).toUpperCase()}</div>
-                    <div className="admin-item-who">
-                      <strong>{m.name}</strong>
-                      <span>
-                        {m.email} · {formatDate(m.created_at)}
-                      </span>
-                    </div>
-                  </div>
-                  <p className="admin-item-text">{m.message}</p>
-                  <div className="admin-project-actions">
-                    <a
-                      className="btn btn-line"
-                      href={`mailto:${m.email}?subject=${encodeURIComponent('Re : ton message sur mon portfolio')}`}
-                    >
-                      Répondre par email
-                    </a>
-                  </div>
-                </article>
-              ))}
-            </div>
-          )}
-        </>
-      )}
-
       {tab === 'parcours' && (
         <>
           <div className="admin-card">
@@ -1155,6 +1156,37 @@ export default function Admin() {
       )}
 
       {tab === 'settings' && (
+        <>
+        <div className="admin-card">
+          <div className="admin-card-head">
+            <h2>Photo de la section « À propos » (accueil)</h2>
+            <span className="admin-hint">Grande photo, de préférence détourée (PNG sans fond)</span>
+          </div>
+          <div className="admin-fields">
+            <div className="field full">
+              <div className="admin-thumbs">
+                {homeAboutImage && (
+                  <div className="admin-thumb big">
+                    <img src={homeAboutImage} alt="Aperçu" />
+                  </div>
+                )}
+                <label className={`admin-upload${homeAboutUploading ? ' busy' : ''}`}>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    onChange={handleHomeAboutUpload}
+                    disabled={homeAboutUploading}
+                    hidden
+                  />
+                  <span>
+                    {homeAboutUploading ? 'Envoi…' : homeAboutImage ? 'Remplacer' : '+ Ajouter'}
+                  </span>
+                </label>
+              </div>
+              {homeAboutError && <p className="form-status error">{homeAboutError}</p>}
+            </div>
+          </div>
+        </div>
         <div className="admin-card">
           <div className="admin-card-head">
             <h2>Photo de la page d'accueil</h2>
@@ -1182,6 +1214,7 @@ export default function Admin() {
             </div>
           </div>
         </div>
+        </>
       )}
     </main>
   )
