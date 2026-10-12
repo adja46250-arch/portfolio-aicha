@@ -65,6 +65,7 @@ export default function ContactBand() {
             </div>
           )}
         </div>
+
       </Reveal>
     </section>
   )

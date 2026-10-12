@@ -534,19 +534,6 @@ export default function Home() {
         <ApClouds targetRef={statsRef} variant="dev-clouds-b" offset={['end end', 'end 35%']} />
       </div>
 
-      <div className="design-band quote-band">
-        <div className="design-motifs" aria-hidden="true">
-          <i className="dm-r" />
-          <i className="dm-l" />
-        </div>
-      <section className="pull-quote wrap">
-        <Reveal>
-          <p>
-            Le code donne vie aux idées. <em>Le design leur donne un sens.</em>
-          </p>
-        </Reveal>
-      </section>
-      </div>
       <div className="cb-wrap">
         <ContactBand />
       </div>

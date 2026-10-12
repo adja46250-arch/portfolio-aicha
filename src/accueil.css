@@ -530,7 +530,7 @@ footer.site.ft { border-top: none; padding: 0; background: linear-gradient(to bo
 @media (max-width: 700px) { .ft-stats { grid-template-columns: 1fr; } }
 
 /* ---------- Transition « Le code donne vie… » → « Parlons-en » : simple dégradé marron → rose saumon ---------- */
-.cb-wrap { --cb-top: clamp(240px, 38vh, 420px); position: relative; background: #1c0a0d; }
+.cb-wrap { --cb-top: clamp(170px, 26vh, 300px); position: relative; background: #1c0a0d; }
 .cb-wrap .cb {
   padding-top: calc(var(--cb-top) + 20px);
   background:
@@ -614,3 +614,44 @@ footer.site.ft { border-top: none; padding: 0; background: linear-gradient(to bo
 .projects-list .project-mock-body .desc, .projects-list .project-mock-body p { color: #e9cfc7; }
 .projects-list .project-mock .pill { color: #f7ece2; border-color: rgba(247, 236, 226, 0.28); }
 .projects-list .project-mock .project-link { color: #f2a58e; }
+
+/* =====================================================================
+   HEADER : plus fin sur toutes les pages + s'adapte aux sections claires
+   ===================================================================== */
+nav.site-nav { height: 56px; }
+.nav-contact { padding: 8px 18px; }
+
+/* Sur l'accueil : noir en haut de page, puis translucide (comme sur la page Projets) dès qu'on scrolle */
+header.site { transition: background 0.35s ease, border-color 0.35s ease, backdrop-filter 0.35s ease; }
+header.site.is-home.scrolled {
+  background: rgba(28, 10, 13, 0.55);
+  backdrop-filter: blur(12px);
+  border-bottom-color: rgba(247, 236, 226, 0.1);
+}
+
+/* =====================================================================
+   PAGE PROJETS : titres de parties plus grands, dégradé saumon → or
+   ===================================================================== */
+.pj-title {
+  font-size: clamp(2.8rem, 6vw, 5rem);
+  background: linear-gradient(90deg, #7a1f2b 0%, #c4584f 45%, #d97a6c 62%, #c9942f 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: #7a1f2b;
+  width: fit-content; padding-bottom: 0.06em;
+}
+.pj-title::after { background: linear-gradient(90deg, #d97a6c, #e8c170); width: 90px; height: 4px; }
+.pj-design .pj-title {
+  background: linear-gradient(90deg, #f7ece2 0%, #f2a58e 50%, #e8c170 100%);
+  -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: #f2a58e;
+}
+.pj-design .pj-title::after { background: linear-gradient(90deg, #f2a58e, #e8c170); }
+
+/* ---------- Banderole inclinée (accueil) ---------- */
+.home-main { overflow-x: clip; }
+.home-main .marquee {
+  --incline: -2.2deg;                 /* ⬅️ réglage : angle de la banderole (0deg = droite, -3deg = plus penchée) */
+  position: relative; z-index: 4;
+  width: 106vw; margin: -30px 0 -30px -3vw; padding: 22px 0;
+  transform: rotate(var(--incline));
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.45);
+}
+@media (max-width: 820px) { .home-main .marquee { --incline: -3deg; } }
