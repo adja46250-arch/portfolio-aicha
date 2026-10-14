@@ -29,6 +29,9 @@ export default function Header() {
           <NavLink to="/projets" className={({ isActive }) => (isActive ? 'active' : '')}>
             Projets
           </NavLink>
+          <NavLink to="/services" className={({ isActive }) => (isActive ? 'active' : '')}>
+            Services
+          </NavLink>
           <NavLink to="/parcours" className={({ isActive }) => (isActive ? 'active' : '')}>
             Parcours
           </NavLink>

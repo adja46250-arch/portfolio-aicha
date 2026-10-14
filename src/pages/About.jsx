@@ -1,7 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import Reveal from '../components/Reveal'
 import { SkillIcons } from '../components/SkillIcons'
+import SkyClouds from '../components/SkyClouds'
 import { supabase, isSupabaseConfigured } from '../lib/supabaseClient'
 
 // Parcours affiché sur la page (modifiable ici, dans le code).
@@ -71,6 +72,12 @@ const EXTRA_TRAININGS = [
 ]
 
 // ---- Compétences : regroupées par domaine, chacune avec son logo.
+const LANGUAGES = [
+  { name: 'Français', level: 'Intermédiaire avancé', note: 'Langue de mes études et de mon travail', score: 4, ghost: 'Fr' },
+  { name: 'Arabe', level: 'Intermédiaire avancé', note: 'Langue de mon enfance en Arabie saoudite', score: 4, ghost: 'ع' },
+  { name: 'Djoula', level: 'Langue maternelle', note: 'La langue de ma famille et de mes racines', score: 5, ghost: 'Dj' },
+]
+
 const SKILLS = [
   {
     group: 'Développement',
@@ -116,112 +123,229 @@ export default function About() {
       })
   }, [])
 
+  const skillsRef = useRef(null)
+  const trackRef = useRef(null)
+  const stageRef = useRef(null)
+  const scrollRef = useRef(null)
+
+  // Le cadre crème et la photo restent fixes ; seule la frise défile à l'intérieur du cadre.
+  useEffect(() => {
+    const track = trackRef.current
+    const stage = stageRef.current
+    const inner = scrollRef.current
+    if (!track || !stage || !inner) return
+    const mq = window.matchMedia('(max-width: 820px)')
+    let raf = 0
+    let dist = 0
+
+    const measure = () => {
+      if (mq.matches) {
+        track.style.height = ''
+        inner.style.transform = ''
+        dist = 0
+        return
+      }
+      dist = Math.max(0, inner.scrollHeight - stage.clientHeight)
+      track.style.height = `${stage.offsetHeight + dist}px`
+      update()
+    }
+    const update = () => {
+      raf = 0
+      if (mq.matches || !dist) return
+      const top = track.getBoundingClientRect().top
+      const p = Math.min(1, Math.max(0, (84 - top) / dist))
+      inner.style.transform = `translate3d(0, ${-p * dist}px, 0)`
+    }
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update) }
+
+    measure()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', measure)
+    const ro = new ResizeObserver(measure)
+    ro.observe(inner)
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', measure)
+      ro.disconnect()
+      if (raf) cancelAnimationFrame(raf)
+    }
+  }, [])
+
   return (
-    <main>
-      <section className="page-hero wrap">
-        <p className="eyebrow">Qui je suis</p>
-        <h1 className="anton">
-          Mon <span className="rose">parcours</span>
-        </h1>
-        <p>
-          Je mêle logique du code et sens créatif pour concevoir des expériences numériques qui ont leur propre identité.
-        </p>
-      </section>
-
-      <Reveal as="section" className="about-block wrap">
-        <h2>Formation</h2>
-
-        <div className="parcours-intro">
-          <p className="parcours-lead">
-            Entre technique et créativité, un parcours guidé par l’envie de comprendre, d’apprendre et de créer.
-          </p>
+    <main className="pc-page">
+      {/* ---------- Titre de la page (même style que « Mes projets ») ---------- */}
+      <div className="pj-hero pc-hero">
+        <div className="design-motifs" aria-hidden="true">
+          <i className="dm-r" />
+          <i className="dm-l" />
+        </div>
+        <section className="page-hero wrap">
+          <p className="eyebrow">Qui je suis</p>
+          <h1 className="anton">
+            Mon <span className="rose">parcours</span>
+          </h1>
           <p>
-            Mon parcours s’est construit entre apprentissage académique, curiosité technique et pratique personnelle.
-            Au fil des années, j’ai développé un profil qui combine développement informatique et création visuelle. Ma formation m’a donné les bases techniques, tandis que mes apprentissages personnels et mes projets m’ont permis d’explorer d’autres domaines et de développer ma créativité.
+            Je mêle logique du code et sens créatif pour concevoir des expériences numériques qui ont leur propre identité.
           </p>
+        </section>
+      </div>
+
+      {/* ---------- Formation : frise sur fond clair, photo fixe sur fond sombre ---------- */}
+      <section className="pc-dark pc-formation">
+        <div className="design-motifs" aria-hidden="true">
+          <i className="dm-r" />
+          <i className="dm-l" />
         </div>
-
-        <div className="formation-layout">
-          <ol className="timeline">
-            {DEFAULT_FORMATIONS.map((f) => (
-              <li key={f.id} className="timeline-item">
-                <span className="timeline-period">{f.period}</span>
-                <h3>{f.title}</h3>
-                {f.place && <span className="timeline-place">{f.place}</span>}
-                {f.description && <p>{f.description}</p>}
-                {f.note && <blockquote className="timeline-note">{f.note}</blockquote>}
-              </li>
-            ))}
-          </ol>
-
-          {photo && (
-            <div className="formation-photo">
-              <span className="formation-shape formation-shape-a" aria-hidden="true" />
-              <span className="formation-shape formation-shape-b" aria-hidden="true" />
-              <span className="formation-dots" aria-hidden="true" />
-              <img src={photo} alt="Aïcha" className="formation-photo-img" />
+        <div className="wrap pc-inner">
+          <Reveal>
+            <div className="pj-head">
+              <span className="dev-eyebrow">Parcours</span>
+              <h2 className="pj-title">Formation</h2>
             </div>
-          )}
-        </div>
+            <div className="parcours-intro">
+              <p className="parcours-lead">
+                Entre technique et créativité, un parcours guidé par l’envie de comprendre, d’apprendre et de créer.
+              </p>
+              <p>
+                Mon parcours s’est construit entre apprentissage académique, curiosité technique et pratique personnelle.
+                Au fil des années, j’ai développé un profil qui combine développement informatique et création visuelle. Ma formation m’a donné les bases techniques, tandis que mes apprentissages personnels et mes projets m’ont permis d’explorer d’autres domaines et de développer ma créativité.
+              </p>
+            </div>
+          </Reveal>
 
-        <p className="parcours-quote">
-          Mon parcours a commencé dans l'électronique avant d'évoluer naturellement vers les
-          sciences informatiques et le développement de solutions numériques.
-        </p>
-      </Reveal>
-
-      <Reveal as="section" className="about-block wrap">
-        <h2>Formations complémentaires</h2>
-        <div className="extra-grid">
-          {EXTRA_TRAININGS.map((t) => (
-            <article key={t.title} className="extra-card">
-              <span className="extra-tag">{t.tag}</span>
-              <h3>{t.title}</h3>
-              <span className="extra-place">{t.place}</span>
-              <p>{t.description}</p>
-            </article>
-          ))}
-        </div>
-      </Reveal>
-
-      <Reveal as="section" className="about-block wrap">
-        <h2>Compétences techniques</h2>
-        <div className="skills-block">
-          {SKILLS.map((s) => (
-            <div key={s.group} className="skills-section">
-              <span className="skills-group">{s.group}</span>
-              <div className="skill-grid">
-                {s.items.map((item) => (
-                  <div key={item.name} className="skill-card">
-                    <span className="skill-icon">{SkillIcons[item.icon]}</span>
-                    {item.name}
-                  </div>
+          <div className="formation-track" ref={trackRef}>
+          <div className="formation-layout formation-stage" ref={stageRef}>
+            <div className="timeline-panel">
+              <div className="timeline-bg" aria-hidden="true">
+                <div className="dev-motifs">
+                  <i className="dm-r" />
+                  <i className="dm-l" />
+                </div>
+              </div>
+              <div className="timeline-scroll" ref={scrollRef}>
+              <ol className="timeline">
+                {DEFAULT_FORMATIONS.map((f) => (
+                  <li key={f.id} className="timeline-item">
+                    <span className="timeline-period">{f.period}</span>
+                    <h3>{f.title}</h3>
+                    {f.place && <span className="timeline-place">{f.place}</span>}
+                    {f.description && <p>{f.description}</p>}
+                    {f.note && <blockquote className="timeline-note">{f.note}</blockquote>}
+                  </li>
                 ))}
+              </ol>
               </div>
             </div>
-          ))}
-        </div>
-      </Reveal>
 
-      <Reveal as="section" className="about-block wrap cv-block">
-        <div className="cv-card">
-          <div className="cv-sheet" aria-hidden="true">
-            <span className="cv-sheet-photo" />
-            <span className="cv-sheet-name" />
-            <span className="cv-sheet-role" />
-            <span className="cv-sheet-line" />
-            <span className="cv-sheet-line short" />
-            <span className="cv-sheet-line" />
-            <span className="cv-sheet-line short" />
-            <span className="cv-sheet-line" />
+            {photo && (
+              <div className="formation-photo">
+                <span className="formation-shape formation-shape-a" aria-hidden="true" />
+                <span className="formation-shape formation-shape-b" aria-hidden="true" />
+                <span className="formation-dots" aria-hidden="true" />
+                <img src={photo} alt="Aïcha" className="formation-photo-img" />
+              </div>
+            )}
           </div>
-          <div className="cv-text">
-            <p className="eyebrow">Parcours, compétences, projets</p>
-            <h2>Mon CV</h2>
-            <p>Disponible sur simple demande, je vous l'envoie par e-mail.</p>
+          </div>
+
+          <p className="parcours-quote">
+            Mon parcours a commencé dans l'électronique avant d'évoluer naturellement vers les
+            sciences informatiques et le développement de solutions numériques.
+          </p>
+        </div>
+      </section>
+
+      {/* ---------- Formations complémentaires ---------- */}
+      <section className="pc-dark pc-extra">
+        <div className="design-motifs" aria-hidden="true">
+          <i className="dm-r" />
+          <i className="dm-l" />
+        </div>
+        <div className="wrap pc-inner">
+          <Reveal>
+            <div className="pj-head">
+              <span className="dev-eyebrow">Parcours</span>
+              <h2 className="pj-title">Formations complémentaires</h2>
+            </div>
+            <p className="pc-lead">Des apprentissages en plus du cursus, pour rester curieuse et toujours avancer.</p>
+          </Reveal>
+          <div className="extra-grid">
+            {EXTRA_TRAININGS.map((t, i) => (
+              <Reveal key={t.title} delay={i * 0.1} as="article" className="extra-card">
+                <span className="extra-num" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                <span className="extra-tag">{t.tag}</span>
+                <h3>{t.title}</h3>
+                <span className="extra-place">{t.place}</span>
+                <p>{t.description}</p>
+              </Reveal>
+            ))}
           </div>
         </div>
-      </Reveal>
+      </section>
+
+      {/* ---------- Langues parlées ---------- */}
+      <section className="pc-dark pc-langues">
+        <div className="design-motifs" aria-hidden="true">
+          <i className="dm-r" />
+          <i className="dm-l" />
+        </div>
+        <div className="wrap pc-inner">
+          <Reveal>
+            <div className="pj-head">
+              <span className="dev-eyebrow">Parcours</span>
+              <h2 className="pj-title">Langues parlées</h2>
+            </div>
+          </Reveal>
+          <div className="lang-grid">
+            {LANGUAGES.map((l, i) => (
+              <Reveal key={l.name} delay={i * 0.1} as="article" className="lang-card">
+                <span className="lang-ghost" aria-hidden="true">{l.ghost}</span>
+                <h3>{l.name}</h3>
+                <span className="lang-level">{l.level}</span>
+                <span className="lang-meter" role="img" aria-label={`Niveau ${l.score} sur 5`}>
+                  {[1, 2, 3, 4, 5].map((n) => (
+                    <i key={n} className={n <= l.score ? 'on' : ''} />
+                  ))}
+                </span>
+                <p>{l.note}</p>
+              </Reveal>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ---------- Compétences techniques : fond clair, dégradé avant et après ---------- */}
+      <div className="pj-top pc-skills" ref={skillsRef}>
+        <div className="dev-motifs" aria-hidden="true">
+          <i className="dm-r" />
+          <i className="dm-l" />
+        </div>
+        <SkyClouds targetRef={skillsRef} variant="dev-clouds" offset={['start end', 'start 15%']} />
+        <section className="wrap pc-inner">
+          <Reveal>
+            <div className="pj-head">
+              <span className="dev-eyebrow">Parcours</span>
+              <h2 className="pj-title">Compétences techniques</h2>
+            </div>
+          </Reveal>
+          <div className="skills-block">
+            {SKILLS.map((sk) => (
+              <Reveal key={sk.group} className="skills-section">
+                <span className="skills-group">{sk.group}</span>
+                <div className="skill-grid">
+                  {sk.items.map((item) => (
+                    <div key={item.name} className="skill-card">
+                      <span className="skill-icon">{SkillIcons[item.icon]}</span>
+                      {item.name}
+                    </div>
+                  ))}
+                </div>
+              </Reveal>
+            ))}
+          </div>
+        </section>
+        <SkyClouds targetRef={skillsRef} variant="dev-clouds-b" offset={['end end', 'end 35%']} />
+      </div>
 
       <Reveal as="section" className="about-block wrap univers-teaser">
         <h2>En dehors du code</h2>

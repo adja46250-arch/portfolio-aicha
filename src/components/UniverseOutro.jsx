@@ -14,8 +14,12 @@ const STEPS = [
   { name: 'Voyage', gift: "L'ouverture aux autres", target: '.travel-section' },
 ]
 
-// La phrase qui défile dans le bandeau (change-la librement)
-const PHRASE = 'Entre un crayon, un fil et un horizon, je tisse mon univers.'
+// Les étiquettes accrochées au fil (change-les librement)
+const TAGS = [
+  { title: 'Maquillage', text: 'Pour des événements, du naturel au grand soir.', icon: '💄' },
+  { title: 'Décoration', text: 'Un lieu, une ambiance, des détails qui font la différence.', icon: '🌿' },
+  { title: 'Surprise', text: 'Je vous laisse le plaisir de le découvrir plus tard.', icon: '?', secret: true },
+]
 
 export default function UniverseOutro() {
   const box = useRef(null)
@@ -130,32 +134,30 @@ export default function UniverseOutro() {
           </div>
         </div>
 
-        <div className="outro-extra">
-          <p className="outro-extra-lead">Et ce n'est pas tout…</p>
-          <p className="outro-extra-text">
-            Je maquille aussi pour des événements, je fais de la décoration, et bien d'autres choses encore.
-          </p>
+        <div className="oc">
+          <p className="oc-lead">Et ce n'est pas tout…</p>
+          <p className="oc-text">Le fil continue : d'autres choses encore s'y accrochent.</p>
 
-          <div className="outro-band" aria-hidden="true">
-            <div className="outro-band-track">
-              {[0, 1].map((k) => (
-                <div className="outro-band-set" key={k}>
-                  {[0, 1, 2].map((n) => (
-                    <span key={n}>
-                      {PHRASE}
-                      <i>✦</i>
-                    </span>
-                  ))}
+          <div className="oc-line">
+            <svg className="oc-svg" viewBox="0 0 1000 90" preserveAspectRatio="none" aria-hidden="true">
+              <path d="M0 8 Q 500 100 1000 8" />
+            </svg>
+            {TAGS.map((t, i) => (
+              <div key={t.title} className={`oc-hang oc-hang-${i + 1}${t.secret ? ' is-secret' : ''}`}>
+                <span className="oc-string" aria-hidden="true" />
+                <div className="oc-tag" tabIndex={0}>
+                  <span className="oc-hole" aria-hidden="true" />
+                  <span className="oc-icon" aria-hidden="true">{t.icon}</span>
+                  <strong>{t.title}</strong>
+                  <span>{t.text}</span>
                 </div>
-              ))}
-            </div>
+              </div>
+            ))}
           </div>
-
-          <p className="outro-extra-sub">Je vous laisse le plaisir de le découvrir plus tard.</p>
         </div>
 
-        <Link to="/parcours" className="outro-back eyebrow">
-          ← Retour au parcours
+        <Link to="/parcours" className="oc-back">
+          <span aria-hidden="true">←</span> Retour au parcours
         </Link>
       </div>
     </Reveal>

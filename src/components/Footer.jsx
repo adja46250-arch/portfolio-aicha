@@ -32,6 +32,7 @@ export default function Footer() {
           <h3>Le site</h3>
           <Link to="/">Accueil</Link>
           <Link to="/projets">Projets</Link>
+          <Link to="/services">Services</Link>
           <Link to="/parcours">Parcours</Link>
         </nav>
 
@@ -69,8 +70,16 @@ export default function Footer() {
 
       <div className="ft-bottom wrap">
         <span>© {year} Adja Aïcha Diarra. Tous droits réservés.</span>
-        <button type="button" onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}>
-          Haut de page <span aria-hidden="true">↑</span>
+        <button
+          type="button"
+          className="ft-top"
+          aria-label="Retour en haut de la page"
+          title="Haut de page"
+          onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
+        >
+          <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+            <path d="M12 19V5M5 12l7-7 7 7" />
+          </svg>
         </button>
       </div>
     </footer>
