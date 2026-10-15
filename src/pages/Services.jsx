@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useProjects } from '../lib/useProjects'
 import Reveal from '../components/Reveal'
@@ -57,10 +57,10 @@ const SERVICES = [
 ]
 
 const STEPS = [
-  { title: 'On discute', text: "Tu m'expliques ton projet, tes envies et ton budget. J'écoute et je pose les bonnes questions." },
-  { title: 'Je propose', text: 'Je te présente une idée claire : maquette, style ou plan du site, avant de me lancer.' },
-  { title: 'Je crée', text: "Je réalise le projet en te tenant au courant. Tu peux demander des ajustements en cours de route." },
-  { title: 'Je livre', text: 'Tu reçois tes fichiers ou ton site en ligne, avec un petit accompagnement pour bien démarrer.' },
+  { title: 'On discute', icon: '💬', tag: 'Un échange', text: "Tu m'expliques ton projet, tes envies et ton budget. J'écoute et je pose les bonnes questions." },
+  { title: 'Je propose', icon: '✏️', tag: 'Une maquette', text: 'Je te présente une idée claire : maquette, style ou plan du site, avant de me lancer.' },
+  { title: 'Je crée', icon: '🧵', tag: 'Le projet prend forme', text: "Je réalise le projet en te tenant au courant. Tu peux demander des ajustements en cours de route." },
+  { title: 'Je livre', icon: '🎁', tag: 'Ton projet prêt', text: 'Tu reçois tes fichiers ou ton site en ligne, avec un petit accompagnement pour bien démarrer.' },
 ]
 
 const norm = (t) => String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase()
@@ -163,6 +163,30 @@ function Illustration({ k, devImage, designImages, brandImages, brandName }) {
 
 export default function Services() {
   const stepsRef = useRef(null)
+  const wayRef = useRef(null)
+  const [wayP, setWayP] = useState(0)
+
+  // Le fil doré se tisse au fil du défilement
+  useEffect(() => {
+    let raf = 0
+    const update = () => {
+      raf = 0
+      const el = wayRef.current
+      if (!el) return
+      const r = el.getBoundingClientRect()
+      const p = (window.innerHeight * 0.78 - r.top) / (r.height * 0.85)
+      setWayP(Math.max(0, Math.min(1, p)))
+    }
+    const onScroll = () => { if (!raf) raf = requestAnimationFrame(update) }
+    update()
+    window.addEventListener('scroll', onScroll, { passive: true })
+    window.addEventListener('resize', onScroll)
+    return () => {
+      window.removeEventListener('scroll', onScroll)
+      window.removeEventListener('resize', onScroll)
+      if (raf) cancelAnimationFrame(raf)
+    }
+  }, [])
   const { projects } = useProjects()
   const [open, setOpen] = useState(0)
 
@@ -298,15 +322,32 @@ export default function Services() {
               <h2 className="pj-title">Comment je travaille</h2>
             </div>
           </Reveal>
-          <ol className="sv-steps">
+          <div className="sv-way" ref={wayRef}>
+            <svg className="sv-way-svg" viewBox="0 0 1000 60" preserveAspectRatio="none" aria-hidden="true">
+              <defs>
+                <linearGradient id="svwg" x1="0" x2="1" y1="0" y2="0">
+                  <stop offset="0" stopColor="#7a1f2b" />
+                  <stop offset="0.55" stopColor="#d97a6c" />
+                  <stop offset="1" stopColor="#d4a24c" />
+                </linearGradient>
+              </defs>
+              <path className="sv-way-base" d="M0 30 L125 30 C250 -6 250 -6 375 30 C500 66 500 66 625 30 C750 -6 750 -6 875 30 L1000 30" vectorEffect="non-scaling-stroke" />
+              <path className="sv-way-line" d="M0 30 L125 30 C250 -6 250 -6 375 30 C500 66 500 66 625 30 C750 -6 750 -6 875 30 L1000 30" pathLength="1" style={{ strokeDashoffset: 1 - wayP }} vectorEffect="non-scaling-stroke" stroke="url(#svwg)" />
+            </svg>
             {STEPS.map((st, i) => (
-              <Reveal key={st.title} delay={i * 0.08} as="li" className="sv-step">
-                <span className="sv-step-n">{i + 1}</span>
-                <h3>{st.title}</h3>
-                <p>{st.text}</p>
+              <Reveal key={st.title} delay={i * 0.08} as="div" className={`sv-way-step ${i % 2 ? 'is-down' : 'is-up'}${wayP >= (i + 0.35) / 4 ? ' is-lit' : ''}`}>
+                <article className="sv-way-card">
+                  <span className="sv-way-ghost" aria-hidden="true">{String(i + 1).padStart(2, '0')}</span>
+                  <span className="sv-way-icon" aria-hidden="true">{st.icon}</span>
+                  <span className="sv-way-tag">{st.tag}</span>
+                  <h3>{st.title}</h3>
+                  <p>{st.text}</p>
+                </article>
+                <span className="sv-way-stem" aria-hidden="true" />
+                <span className="sv-way-dot" aria-hidden="true" />
               </Reveal>
             ))}
-          </ol>
+          </div>
         </section>
         <SkyClouds targetRef={stepsRef} variant="dev-clouds-b" offset={['end end', 'end 35%']} />
       </div>

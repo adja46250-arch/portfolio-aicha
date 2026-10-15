@@ -1062,3 +1062,45 @@ header.site.is-home.scrolled {
   -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 56px, #000 calc(100% - 56px), transparent 100%), linear-gradient(to right, transparent 0, #000 36px, #000 calc(100% - 36px), transparent 100%);
   mask-image: linear-gradient(to bottom, transparent 0, #000 56px, #000 calc(100% - 56px), transparent 100%), linear-gradient(to right, transparent 0, #000 36px, #000 calc(100% - 36px), transparent 100%);
 }
+
+/* =====================================================================
+   « Comment je travaille » : un fil doré ondulant, étapes en haut / en bas
+   ===================================================================== */
+.sv-way { position: relative; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); align-items: stretch; padding-bottom: calc(var(--dev-fade) * 1.05); }
+.sv-way-svg { position: absolute; left: 0; right: 0; top: calc((100% - var(--dev-fade) * 1.05) / 2 - 30px); height: 60px; width: 100%; overflow: visible; pointer-events: none; z-index: 0; }
+.sv-way-base { fill: none; stroke: rgba(122, 31, 43, 0.18); stroke-width: 3; stroke-dasharray: 2 9; stroke-linecap: round; }
+.sv-way-line { fill: none; stroke-width: 4; stroke-linecap: round; stroke-dasharray: 1; filter: drop-shadow(0 4px 6px rgba(122, 31, 43, 0.25)); }
+.sv-way-step { position: relative; z-index: 1; display: grid; grid-template-rows: 1fr 60px 1fr; padding: 0 clamp(8px, 1.2vw, 18px); }
+.sv-way-card {
+  position: relative; overflow: hidden; padding: 22px 22px 24px; border-radius: 28px;
+  background: rgba(255, 255, 255, 0.62); border: 1px solid rgba(122, 31, 43, 0.16);
+  box-shadow: 0 22px 44px rgba(74, 21, 32, 0.16); backdrop-filter: blur(6px);
+  transition: transform 0.4s ease, box-shadow 0.4s ease, border-color 0.4s ease;
+}
+.sv-way-step.is-up .sv-way-card { grid-row: 1; align-self: end; margin-bottom: 30px; }
+.sv-way-step.is-down .sv-way-card { grid-row: 3; align-self: start; margin-top: 30px; }
+.sv-way-step.is-lit .sv-way-card { border-color: rgba(212, 162, 76, 0.6); box-shadow: 0 28px 50px rgba(122, 31, 43, 0.22); }
+.sv-way-card:hover { transform: translateY(-4px); }
+.sv-way-ghost {
+  position: absolute; top: -6px; right: 14px; font-family: 'Anton', sans-serif; font-size: 5rem; line-height: 1;
+  background: linear-gradient(180deg, rgba(122, 31, 43, 0.22), rgba(212, 162, 76, 0.04)); -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent;
+}
+.sv-way-icon { display: grid; place-items: center; width: 46px; height: 46px; border-radius: 16px; font-size: 1.4rem; background: linear-gradient(135deg, #f7ece2, #f2c9b8); box-shadow: inset 0 0 0 1px rgba(122, 31, 43, 0.15); }
+.sv-way-tag { display: inline-block; margin: 14px 0 6px; font-size: 0.7rem; font-weight: 700; letter-spacing: 0.16em; text-transform: uppercase; color: #a32638; }
+.sv-way-card h3 { font-family: 'Anton', sans-serif; font-weight: 400; text-transform: uppercase; letter-spacing: 0.01em; font-size: 1.6rem; line-height: 1.1; color: #2a1114; margin-bottom: 8px; }
+.sv-way-card p { color: #5a3a3d; line-height: 1.65; font-size: 0.98rem; }
+.sv-way-stem { width: 2px; height: 30px; justify-self: center; background: linear-gradient(to bottom, rgba(122, 31, 43, 0.5), rgba(212, 162, 76, 0.6)); }
+.sv-way-step.is-up .sv-way-stem { grid-row: 1; align-self: end; }
+.sv-way-step.is-down .sv-way-stem { grid-row: 3; align-self: start; background: linear-gradient(to top, rgba(122, 31, 43, 0.5), rgba(212, 162, 76, 0.6)); }
+.sv-way-dot { grid-row: 2; align-self: center; justify-self: center; width: 22px; height: 22px; border-radius: 50%; background: #f7ece2; border: 3px solid rgba(122, 31, 43, 0.35); transition: background 0.5s ease, border-color 0.5s ease, box-shadow 0.5s ease, transform 0.5s ease; }
+.sv-way-step.is-lit .sv-way-dot { background: radial-gradient(circle at 35% 30%, #c23048, #7a1f2b); border-color: #d4a24c; box-shadow: 0 0 0 6px rgba(212, 162, 76, 0.25), 0 8px 16px rgba(122, 31, 43, 0.35); transform: scale(1.12); }
+
+@media (max-width: 820px) {
+  .sv-way { grid-template-columns: 1fr; gap: 22px; padding-left: 34px; }
+  .sv-way::before { content: ''; position: absolute; left: 10px; top: 8px; bottom: calc(var(--dev-fade) * 1.05); width: 3px; border-radius: 3px; background: linear-gradient(to bottom, #7a1f2b, #d97a6c, #d4a24c); opacity: 0.5; }
+  .sv-way-svg, .sv-way-stem { display: none; }
+  .sv-way-step { display: block; padding: 0; }
+  .sv-way-step .sv-way-card { margin: 0 !important; }
+  .sv-way-dot { position: absolute; left: -33px; top: 22px; }
+}
+.sv-way-step > * { grid-column: 1; }
